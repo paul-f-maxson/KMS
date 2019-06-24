@@ -7,8 +7,9 @@ export interface PresentationalProps {
   }>;
 }
 
-export default ({ orders }: PresentationalProps) => (
+export default ({ orders }: PresentationalProps = { orders: [] }) => (
   <>
+    <h1>Tickets</h1>
     {orders.map(order => (
       <>
         <h2>{order.table}</h2>

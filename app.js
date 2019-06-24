@@ -1,16 +1,13 @@
 const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
-const axios = require('axios');
-const path = require('path');
-
-const index = require('./routes/index');
 
 const app = express();
 
-// Create the socket.io server
-const server = http.createServer(app);
-const io = socketIo(server);
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+const path = require('path');
+
+const port = process.env.PORT || 5001;
+server.listen(port, () => console.log('App is listening on port ' + port));
 
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
@@ -20,7 +17,22 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname + '/client/build/index.html'));
 });
 
-const port = process.env.PORT || 5000;
-app.listen(port);
+io.on('connection', socket => {
+  console.log('connection');
 
-console.log('App is listening on port ' + port);
+  socket.emit('update', [
+    { table: 100, meals: [{ seat: 1, dish: 'apples' }] },
+    {
+      table: 200,
+      meals: [{ seat: 1, dish: 'apples' }, { seat: 3, dish: 'oranges' }],
+    },
+    {
+      table: 710,
+      meals: [{ seat: 2, dish: 'grapes' }, { seat: 4, dish: 'bananas' }],
+    },
+  ]);
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
+});

@@ -1,19 +1,12 @@
 import React from 'react';
 import Presentational from './Presentational';
+import SocketIOClient from 'socket.io-client';
+import useSocket from './useSocket';
+
+const socket = SocketIOClient.connect('/');
 
 const App: React.FC = () => {
-  const orders = [
-    { table: 100, meals: [{ seat: 1, dish: 'apples' }] },
-    {
-      table: 200,
-      meals: [{ seat: 1, dish: 'apples' }, { seat: 3, dish: 'oranges' }],
-    },
-    {
-      table: 710,
-      meals: [{ seat: 2, dish: 'grapes' }, { seat: 4, dish: 'bananas' }],
-    },
-  ];
-
+  const orders = useSocket(socket, []);
   return <Presentational orders={orders} />;
 };
 
