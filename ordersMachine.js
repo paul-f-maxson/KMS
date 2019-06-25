@@ -1,10 +1,11 @@
-import { Machine, assign } from 'xstate';
+const { Machine, assign } = require('xstate');
 
+// TODO: validate new order
 const addOrder = assign({
   orders: (ctx, event) => [...ctx.orders, event.order],
 });
 
-export default Machine(
+module.exports = Machine(
   {
     id: 'orders',
     context: {
