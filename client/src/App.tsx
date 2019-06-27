@@ -6,7 +6,7 @@ import useSocket from './useSocket';
 const socket = SocketIOClient.connect('/');
 
 const App: React.FC = () => {
-  const orders = useSocket(socket, []);
+  const { orders } = useSocket(socket, { orders: [] });
   return <Presentational orders={orders} />;
 };
 
