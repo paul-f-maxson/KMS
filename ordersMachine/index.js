@@ -1,27 +1,74 @@
+const R = require('ramda');
+
 const {
   Machine,
   assign,
+  spawn,
+  send,
   actions: { log },
 } = require('xstate');
 
-// const { itemMachine } = require('./itemMachine');
+const { emit } = require('./actions');
 
-const updateOrders = (ctx, event) => [...ctx.orders, event.order];
+const [
+  orderMachine,
+  orderMachineDefaultContext,
+  orderMachineDefaultConfig,
+] = require('./orderMachine');
 
-// TODO: validate new order
-const addOrder = assign({
-  orders: updateOrders,
-});
-
-// TODO: Can't have to type long strings for action names
 module.exports = io => {
-  const { emitOverSocket } = require('./actionCreators')(io);
+  const emitFired = id =>
+    emit(io, `orderUpdate:${id}`, () => ({ state: 'ready' }));
+  const emitStarted = id =>
+    emit(io, `orderUpdate:${id}`, () => ({ state: 'working' }));
+
+  // TODO: validate new order
+  const addOrder = assign({
+    orders: (ctx, evt) =>
+      ctx.orders.set(
+        evt.id,
+        spawn(
+          orderMachine
+            .withContext({
+              ...orderMachineDefaultContext,
+              order: evt.order,
+              id: evt.id,
+              /** TODO: get delay from config */
+              delay: 1000,
+            })
+            .withConfig({
+              ...orderMachineDefaultConfig,
+              actions: {
+                ...orderMachineDefaultConfig.actions,
+                emitFired: emitFired(evt.id),
+                emitStarted: emitStarted(evt.id),
+              },
+            }),
+          evt.id
+        )
+      ),
+  });
+
+  const emitNewOrder = emit(io, 'newOrder', (ctx, evt) => evt);
+
+  const emitRemovedOrder = emit(io, 'orderRemoved', (ctx, evt) => evt);
+
+  const forwardToOrder = send((ctx, evt) => evt, {
+    to: (ctx, evt) => ctx.orders.get(evt.id),
+  });
+
+  const removeOrder = assign({
+    orders: (ctx, evt) => {
+      ctx.orders.delete(evt.id);
+      return ctx.orders;
+    },
+  });
 
   return Machine(
     {
       id: 'orders',
       context: {
-        orders: [],
+        orders: new Map(),
       },
       initial: 'active',
       states: {
@@ -30,17 +77,34 @@ module.exports = io => {
       on: {
         ADD: {
           target: '.active',
-          actions: ['addOrder', 'log', 'emitNewOrdersUpdateOverSocket'],
+          actions: ['log', 'addOrder', 'emitNewOrder'],
+        },
+        FIRE: {
+          target: '.active',
+          actions: ['log', 'forwardToOrder'],
+        },
+        START: {
+          target: '.active',
+          actions: ['log', 'forwardToOrder'],
+        },
+        BUMP: {
+          target: '.active',
+          actions: ['log', 'forwardToOrder'],
+        },
+        DONE: {
+          target: '.active',
+          actions: ['log', 'removeOrder', 'emitRemovedOrder'],
         },
       },
     },
     {
       actions: {
-        log: log(),
         addOrder,
-        emitNewOrdersUpdateOverSocket: emitOverSocket('update', (ctx, evt) => ({
-          orders: [...ctx.orders, evt.order],
-        })),
+        emitNewOrder,
+        forwardToOrder,
+        removeOrder,
+        emitRemovedOrder,
+        log: log((ctx, evt) => evt),
       },
     }
   );
