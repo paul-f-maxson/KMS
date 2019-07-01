@@ -17,6 +17,10 @@ const [
 ] = require('./orderMachine');
 
 module.exports = io => {
+  // TODO: These are only used by the order machine and should therefor be defined by that module.
+  // I'm doing it here because it makes the dependency web less complex re: the order's id.
+  // Probably the better thing to do would be to create a namespace based on the order's id.
+  // The orderMachine module could be dependent on an io like this module is, and this namespace could be passed in to the require.
   const emitFired = id =>
     emit(io, `orderUpdate:${id}`, () => ({ state: 'ready' }));
   const emitStarted = id =>
