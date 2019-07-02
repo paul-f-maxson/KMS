@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const { Server } = require('http');
 
@@ -7,11 +9,11 @@ const { interpret } = require('xstate');
 // Routers
 const apiRouter = require('./routes/api');
 
+const makeOrdersMachine = require('./ordersMachine');
+
 const app = express();
 const server = Server(app);
 const io = require('socket.io')(server);
-
-const ordersMachine = require('./ordersMachine')(io);
 
 // logging
 io.on('connection', socket => {
@@ -23,7 +25,7 @@ io.on('connection', socket => {
 });
 
 // Initialize the FSM interpretation service
-app.locals.ordersService = interpret(ordersMachine).start();
+app.locals.ordersService = interpret(makeOrdersMachine(io)).start();
 
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));

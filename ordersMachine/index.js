@@ -1,4 +1,4 @@
-const R = require('ramda');
+const makeOrderMachine = require('./orderMachine');
 
 const {
   Machine,
@@ -16,10 +16,9 @@ module.exports = io => {
   const addOrder = assign({
     orders: (ctx, evt) => {
       // Import the machine to be used as an actor, passing it a socket namespace based on the id
-      const [
-        orderMachine,
-        orderMachineDefaultContext,
-      ] = require('./orderMachine')(io.to(`order:${evt.id}`));
+      const [orderMachine, orderMachineDefaultContext] = makeOrderMachine(
+        io.to(`order:${evt.id}`)
+      );
 
       // Spawn the new actor, passing the order and id in as context (without overiding any other context values the machine might have).
       // Add this new actor to the orders Map, keying it by the order's id
