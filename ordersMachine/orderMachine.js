@@ -1,49 +1,71 @@
 const {
   Machine,
+  send,
   sendParent,
   actions: { log },
 } = require('xstate');
 
-const defaultConfig = {
-  actions: {
-    log: log((ctx, evt) => evt),
-    sendParentDone: ctx => sendParent({ type: 'DONE', id: ctx.id }),
-  },
-  delays: {
-    DELAY: ctx => ctx.delay,
-  },
-};
+const { emit } = require('./actions');
 
-module.exports = [
-  Machine(
-    {
-      id: 'order',
-      initial: 'delayed',
-      states: {
-        delayed: {
-          id: 'delayed',
-          onEntry: 'log',
-          after: {
-            DELAY: 'ready',
-          },
-          on: { FIRE: 'ready' },
-        },
-        ready: {
-          id: 'ready',
-          onEntry: ['log', 'emitFired'],
-          on: { START: 'working' },
-        },
-        working: {
-          id: 'working',
-          onEntry: ['log', 'emitStarted'],
-          on: { BUMP: 'done' },
-        },
-        done: { id: 'done', onEntry: 'log', type: 'final' },
-      },
-      onDone: { target: '.done', actions: 'sendParentDone' },
+module.exports = io => {
+  const emitFired = emit(io, `orderUpdate`, () => ({ state: 'ready' }));
+  const emitStarted = emit(io, `orderUpdate`, () => ({ state: 'working' }));
+
+  const defaultConfig = {
+    actions: {
+      log: log(
+        (ctx, evt) => ({
+          id: ctx.id,
+          evt,
+        }),
+        'order log:'
+      ),
+
+      emitFired,
+      emitStarted,
+
+      sendParentDone: sendParent(ctx => ({ type: 'ORDER_DONE', id: ctx.id })),
     },
-    defaultConfig
-  ),
-  {}, // default context
-  defaultConfig,
-];
+
+    delays: {
+      DELAY: ctx => ctx.delay,
+    },
+  };
+
+  return [
+    Machine(
+      {
+        id: 'order',
+        initial: 'delayed',
+
+        states: {
+          delayed: {
+            id: 'delayed',
+            entry: ['log', send('FIRE_ORDER', { delay: ctx => ctx.delay })],
+
+            on: { ['FIRE_ORDER']: 'ready' },
+          },
+
+          ready: {
+            id: 'ready',
+            entry: ['log', 'emitFired'],
+            on: { ['START_ORDER']: 'working' },
+          },
+
+          working: {
+            id: 'working',
+            entry: ['log', 'emitStarted'],
+            on: { ['BUMP_ORDER']: 'done' },
+          },
+
+          done: { id: 'done', entry: 'log', type: 'final' },
+        },
+
+        onDone: { actions: 'sendParentDone' },
+      },
+      defaultConfig
+    ),
+    {}, // default context
+    defaultConfig,
+  ];
+};

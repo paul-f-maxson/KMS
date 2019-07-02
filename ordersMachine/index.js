@@ -10,97 +10,97 @@ const {
 
 const { emit } = require('./actions');
 
-const [
-  orderMachine,
-  orderMachineDefaultContext,
-  orderMachineDefaultConfig,
-] = require('./orderMachine');
-
 module.exports = io => {
-  // TODO: These are only used by the order machine and should therefor be defined by that module.
-  // I'm doing it here because it makes the dependency web less complex re: the order's id.
-  // Probably the better thing to do would be to create a namespace based on the order's id.
-  // The orderMachine module could be dependent on an io like this module is, and this namespace could be passed in to the require.
-  const emitFired = id =>
-    emit(io, `orderUpdate:${id}`, () => ({ state: 'ready' }));
-  const emitStarted = id =>
-    emit(io, `orderUpdate:${id}`, () => ({ state: 'working' }));
+  // CONTEXT MODIFICATION ACTIONS
 
   // TODO: validate new order
   const addOrder = assign({
-    orders: (ctx, evt) =>
+    orders: (ctx, evt) => {
+      // Import the machine to be used as an actor, passing it a socket namespace based on the id
+      const [
+        orderMachine,
+        orderMachineDefaultContext,
+      ] = require('./orderMachine')(io.to(`order:${evt.id}`));
+
+      // Spawn the new actor, passing the order and id in as context (without overiding any other context values the machine might have).
+      // Add this new actor to the orders Map, keying it by the order's id
       ctx.orders.set(
         evt.id,
+
         spawn(
-          orderMachine
-            .withContext({
-              ...orderMachineDefaultContext,
-              order: evt.order,
-              id: evt.id,
-              /** TODO: get delay from config */
-              delay: 1000,
-            })
-            .withConfig({
-              ...orderMachineDefaultConfig,
-              actions: {
-                ...orderMachineDefaultConfig.actions,
-                emitFired: emitFired(evt.id),
-                emitStarted: emitStarted(evt.id),
-              },
-            }),
+          orderMachine.withContext({
+            ...orderMachineDefaultContext,
+            order: evt.order,
+            id: evt.id,
+            delay: evt.delay,
+          }),
+
           evt.id
         )
-      ),
-  });
+      );
 
-  const emitNewOrder = emit(io, 'newOrder', (ctx, evt) => evt);
-
-  const emitRemovedOrder = emit(io, 'orderRemoved', (ctx, evt) => evt);
-
-  const forwardToOrder = send((ctx, evt) => evt, {
-    to: (ctx, evt) => ctx.orders.get(evt.id),
+      // Return a copy of the orders Map (for purity's sake)
+      return new Map(ctx.orders.entries());
+    },
   });
 
   const removeOrder = assign({
     orders: (ctx, evt) => {
       ctx.orders.delete(evt.id);
-      return ctx.orders;
+      return new Map(ctx.orders.entries());
     },
   });
+
+  // CHILD ACTOR COMMUNICATION ACTIONS
+  const forwardToOrder = send((ctx, evt) => evt, {
+    to: (ctx, evt) => ctx.orders.get(evt.id),
+  });
+
+  // SOCKET SIDE EFFECT ACTIONS
+  const emitNewOrder = emit(io, 'newOrder', (ctx, evt) => evt);
+
+  const emitRemovedOrder = emit(io, 'orderRemoved', (ctx, evt) => evt);
 
   return Machine(
     {
       id: 'orders',
+
       context: {
         orders: new Map(),
       },
+
       initial: 'active',
+
       states: {
-        active: {},
-      },
-      on: {
-        ADD: {
-          target: '.active',
-          actions: ['log', 'addOrder', 'emitNewOrder'],
-        },
-        FIRE: {
-          target: '.active',
-          actions: ['log', 'forwardToOrder'],
-        },
-        START: {
-          target: '.active',
-          actions: ['log', 'forwardToOrder'],
-        },
-        BUMP: {
-          target: '.active',
-          actions: ['log', 'forwardToOrder'],
-        },
-        DONE: {
-          target: '.active',
-          actions: ['log', 'removeOrder', 'emitRemovedOrder'],
+        active: {
+          id: 'active',
+
+          on: {
+            ADD: {
+              actions: ['log', 'addOrder', 'emitNewOrder'],
+            },
+
+            FIRE_ORDER: {
+              actions: ['log', 'forwardToOrder'],
+            },
+
+            START_ORDER: {
+              target: '.',
+              actions: ['log', 'forwardToOrder'],
+            },
+
+            BUMP_ORDER: {
+              actions: ['log', 'forwardToOrder'],
+            },
+
+            ORDER_DONE: {
+              actions: ['log', 'removeOrder', 'emitRemovedOrder'],
+            },
+          },
         },
       },
     },
+
     {
       actions: {
         addOrder,
@@ -108,7 +108,7 @@ module.exports = io => {
         forwardToOrder,
         removeOrder,
         emitRemovedOrder,
-        log: log((ctx, evt) => evt),
+        log: log((ctx, evt) => evt, 'controller log:'),
       },
     }
   );

@@ -1,14 +1,17 @@
 const { interpret } = require('xstate');
-const machine = require('./')({ emit: () => {} });
+
+// Dummy socket.IO instance
+const io = { to: () => ({ emit: () => {} }), emit: () => {} };
+const machine = require('./')(io);
 
 const service = interpret(machine).start();
 
 service.send({
   type: 'ADD',
   id: '1',
+  delay: 1000,
   order: { table: 100, meals: [{ seat: 1, dish: 'apples' }] },
 });
 
-service.send({ type: 'FIRE', id: '1' });
-service.send({ type: 'START', id: '1' });
-service.send({ type: 'BUMP', id: '1' });
+setTimeout(() => service.send({ type: 'START_ORDER', id: '1' }), 2000);
+setTimeout(() => service.send({ type: 'BUMP_ORDER', id: '1' }), 3000);
