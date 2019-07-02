@@ -12,7 +12,6 @@ const { emit } = require('./actions');
 
 module.exports = io => {
   // CONTEXT MODIFICATION ACTIONS
-
   // TODO: validate new order
   const addOrder = assign({
     orders: (ctx, evt) => {
@@ -108,7 +107,7 @@ module.exports = io => {
         forwardToOrder,
         removeOrder,
         emitRemovedOrder,
-        log: log((ctx, evt) => evt, 'controller log:'),
+        log: () => {} /* log((ctx, evt) => evt, 'controller log:') */,
       },
     }
   );

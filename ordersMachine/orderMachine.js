@@ -13,13 +13,13 @@ module.exports = io => {
 
   const defaultConfig = {
     actions: {
-      log: log(
+      log: () => {} /* log(
         (ctx, evt) => ({
           id: ctx.id,
           evt,
         }),
         'order log:'
-      ),
+      ) */,
 
       emitFired,
       emitStarted,

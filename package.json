@@ -9,6 +9,7 @@
   },
   "scripts": {
     "build": "cd client && yarn build",
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "jest"
   }
 }
