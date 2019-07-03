@@ -9,7 +9,7 @@ const { interpret } = require('xstate');
 // Routers
 const apiRouter = require('./routes/api');
 
-const makeOrdersMachine = require('../ordersMachine');
+const makeOrdersMachine = require('./ordersMachine');
 
 const app = express();
 const server = Server(app);

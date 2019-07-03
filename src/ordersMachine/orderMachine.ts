@@ -1,9 +1,9 @@
 import { Machine, send, sendParent, actions } from 'xstate';
+const { log } = actions;
+
 import * as XState from 'xstate';
 
-import { emit } from './actions';
-
-const { log } = actions;
+const { emit } = require('./actions');
 
 interface OrderContext {
   id: string;

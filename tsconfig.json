@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
+    "rootDir": "src",
     "target": "es6",
-    "module": "es2015",
+    "module": "umd",
     "moduleResolution": "node",
     "noImplicitAny": true,
-    "removeComments": true,
     "preserveConstEnums": true,
     "sourceMap": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "src/client/**/*", "**/*.spec.ts"]
+  "include": ["**/*"],
+  "exclude": ["node_modules", "client/**/*", "**/*.spec.ts"]
 }

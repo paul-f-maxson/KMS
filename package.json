@@ -8,6 +8,7 @@
     "ramda": "^0.26.1",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0",
+    "typescript": "^3.5.2",
     "xstate": "^4.6.2"
   },
   "devDependencies": {
@@ -15,7 +16,7 @@
   },
   "scripts": {
     "tsc": "tsc",
-    "dev": "NODE_ENV='development' && ts-node-dev --respawn --transpileOnly ./app/app.ts",
+    "dev": "NODE_ENV='development' && ts-node-dev --respawn --transpileOnly ./src/app.js",
     "prod": "NODE_ENV='production' && tsc && node ./build/app.js",
     "build-client": "cd client && yarn build",
     "test": "jest"
