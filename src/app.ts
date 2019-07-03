@@ -5,13 +5,13 @@ const { Server } = require('http');
 const path = require('path');
 
 import { interpret } from 'xstate';
-import SocketIO from 'socket.io';
+const SocketIO = require('socket.io');
 import { OrdersContext, OrdersStateSchema } from './ordersMachine';
 
 // Routers
 const apiRouter = require('./routes/api');
 
-const makeOrdersMachine = require('./ordersMachine');
+import makeOrdersMachine from './ordersMachine';
 
 const app = express();
 const server = Server(app);
