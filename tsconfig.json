@@ -3,8 +3,10 @@
     "rootDir": "src",
     "target": "es6",
     "module": "umd",
+    "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "noImplicitAny": true,
+    "noImplicitReturns": true,
     "preserveConstEnums": true,
     "sourceMap": true
   },

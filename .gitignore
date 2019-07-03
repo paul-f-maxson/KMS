@@ -2,5 +2,7 @@ node_modules
 build
 
 .env
+nodemon.json
+
 yarn-error.log
 yarn.lock

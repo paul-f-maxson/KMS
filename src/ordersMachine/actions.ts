@@ -1,6 +1,6 @@
 import * as XState from 'xstate';
 
-module.exports.emit = function<TContext, TEvent extends XState.EventObject>(
+export const emit = function<TContext, TEvent extends XState.EventObject>(
   io: SocketIO.Socket,
   eventType: string,
   transformer: (ctx: TContext, evt: TEvent) => object

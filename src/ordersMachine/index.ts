@@ -8,9 +8,9 @@ const {
   actions: { log },
 } = require('xstate');
 
-const { emit } = require('./actions');
+import { emit } from './actions';
 
-module.exports = io => {
+export default (io: SocketIO.Socket) => {
   // CONTEXT MODIFICATION ACTIONS
   // TODO: validate new order
   const addOrder = assign({

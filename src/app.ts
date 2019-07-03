@@ -2,9 +2,10 @@ require('dotenv').config();
 
 const express = require('express');
 const { Server } = require('http');
-
 const path = require('path');
-const { interpret } = require('xstate');
+
+import XState, { interpret } from 'xstate';
+import SocketIO from 'socket.io';
 
 // Routers
 const apiRouter = require('./routes/api');
@@ -13,10 +14,11 @@ const makeOrdersMachine = require('./ordersMachine');
 
 const app = express();
 const server = Server(app);
-const io = require('socket.io')(server);
+
+const io = SocketIO(server);
 
 // logging
-io.on('connection', socket => {
+io.on('connection', (socket: SocketIO.Socket) => {
   console.log(`socket ${socket.id} connected`);
 
   socket.on('disconnect', () => {
