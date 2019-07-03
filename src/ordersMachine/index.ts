@@ -1,19 +1,34 @@
 const makeOrderMachine = require('./orderMachine');
 
-const {
-  Machine,
-  assign,
-  spawn,
-  send,
-  actions: { log },
-} = require('xstate');
+import XState, { Machine, assign, spawn, send, actions } from 'xstate';
+const { log } = actions;
 
 import { emit } from './actions';
+import { OrderContext, OrderEvent, Order } from './orderMachine';
+import { Actor } from 'xstate/lib/Actor';
+
+export interface OrdersContext {
+  orders: Map<string, Actor<OrderContext, OrderEvent>>;
+}
+
+export interface OrdersStateSchema {
+  states: {
+    active: {};
+  };
+}
+
+type AddOrderEvent = { type: 'ADD'; id: string; delay: number; order: Order };
+
+type OrderDoneEvent = { type: 'ORDER_DONE'; id: string };
+
+export type OrdersEvent = AddOrderEvent | OrderDoneEvent | OrderEvent;
+
+// export type OrdersEvent = { type: 'ADD'; delay: number; order: Order };
 
 export default (io: SocketIO.Socket) => {
   // CONTEXT MODIFICATION ACTIONS
   // TODO: validate new order
-  const addOrder = assign({
+  const addOrder = assign<OrdersContext, AddOrderEvent>({
     orders: (ctx, evt) => {
       // Import the machine to be used as an actor, passing it a socket namespace based on the id
       const [orderMachine, orderMachineDefaultContext] = makeOrderMachine(
@@ -42,7 +57,7 @@ export default (io: SocketIO.Socket) => {
     },
   });
 
-  const removeOrder = assign({
+  const removeOrder = assign<OrdersContext, OrderDoneEvent>({
     orders: (ctx, evt) => {
       ctx.orders.delete(evt.id);
       return new Map(ctx.orders.entries());
@@ -50,16 +65,22 @@ export default (io: SocketIO.Socket) => {
   });
 
   // CHILD ACTOR COMMUNICATION ACTIONS
-  const forwardToOrder = send((ctx, evt) => evt, {
+  const forwardToOrder = send<OrdersContext, OrderEvent>((ctx, evt) => evt, {
     to: (ctx, evt) => ctx.orders.get(evt.id),
   });
 
   // SOCKET SIDE EFFECT ACTIONS
-  const emitNewOrder = emit(io, 'newOrder', (ctx, evt) => evt);
+  // Forward the recieved event to the socket
+  const emitNewOrder = emit<OrdersContext, AddOrderEvent>(
+    io,
+    'newOrder',
+    (ctx, evt) => evt
+  );
 
+  // Forward the recieved event to the socket
   const emitRemovedOrder = emit(io, 'orderRemoved', (ctx, evt) => evt);
 
-  return Machine(
+  return Machine<OrdersContext, OrdersStateSchema, OrdersEvent>(
     {
       id: 'orders',
 

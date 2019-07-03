@@ -4,8 +4,9 @@ const express = require('express');
 const { Server } = require('http');
 const path = require('path');
 
-import XState, { interpret } from 'xstate';
+import { interpret } from 'xstate';
 import SocketIO from 'socket.io';
+import { OrdersContext, OrdersStateSchema } from './ordersMachine';
 
 // Routers
 const apiRouter = require('./routes/api');
@@ -27,7 +28,9 @@ io.on('connection', (socket: SocketIO.Socket) => {
 });
 
 // Initialize the FSM interpretation service
-app.locals.ordersService = interpret(makeOrdersMachine(io)).start();
+app.locals.ordersService = interpret<OrdersContext, OrdersStateSchema>(
+  makeOrdersMachine(io)
+).start();
 
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));

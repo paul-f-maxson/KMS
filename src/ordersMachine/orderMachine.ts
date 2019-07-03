@@ -3,19 +3,16 @@ const { log } = actions;
 
 import { emit } from './actions';
 
-interface OrderContext {
+export type Order = {
+  table: number;
+  meals: Array<{ seat: number; dish: string }>;
+};
+
+export interface OrderContext {
   id: string;
   delay: number;
-  order: {
-    table: number;
-    meals: Array<{ seat: number; dish: string }>;
-  };
+  order: Order;
 }
-
-type OrderEvent =
-  | { type: 'FIRE_ORDER' }
-  | { type: 'START_ORDER' }
-  | { type: 'BUMP_ORDER' };
 
 interface OrderStateSchema {
   states: {
@@ -25,6 +22,11 @@ interface OrderStateSchema {
     done: {};
   };
 }
+
+export type OrderEvent = {
+  type: 'FIRE_ORDER' | 'START_ORDER' | 'BUMP_ORDER';
+  id: string;
+};
 
 module.exports = (io: SocketIO.Socket) => {
   const emitFired = emit(io, 'orderUpdate', () => ({ state: 'ready' }));
