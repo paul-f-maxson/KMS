@@ -11,6 +11,21 @@ router.post('/dispatch', (req, res) => {
   res.end();
 });
 
-// usage example: fetch('http://localhost:5001/api/dispatch', {method: 'POST', mode: 'cors', headers: {'Content-type': 'application/json'}, body: JSON.stringify({event: {type: 'ADD', order: {table: 100, meals: [{seat: 1, dish: 'apples'}]}})}}).then(console.log).catch(console.error)
+// usage example:
+/* 
+fetch('http://localhost:5001/api/dispatch', {
+  method: 'POST',
+  mode: 'cors',
+  headers: { 'Content-type': 'application/json' },
+  body: JSON.stringify({
+    event: {
+      type: 'ADD',
+      order: { table: 100, meals: [{ seat: 1, dish: 'apples' }] },
+    },
+  }),
+})
+  .then(console.log)
+  .catch(console.error);
+ */
 
 module.exports = router;

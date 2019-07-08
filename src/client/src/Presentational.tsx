@@ -1,27 +1,30 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
-export interface PresentationalProps {
-  orders: Array<{
-    table: number;
-    meals: Array<{ seat: number; dish: string }>;
-  }>;
+import { SocketRootContext } from '.';
+import useBackendSocket from './hooks/useBackendSocket';
+import { Action } from './types';
+
+export interface LocalState {
+  ordersCount: number;
 }
 
-export default ({ orders }: PresentationalProps = { orders: [] }) => (
-  <>
-    <h1>Tickets</h1>
-    {orders.map(order => (
-      <>
-        <h2>{order.table}</h2>
-        <ul>
-          {order.meals.map(meal => (
-            <li>
-              <h3>{meal.seat}</h3>
-              <p>{meal.dish}</p>
-            </li>
-          ))}
-        </ul>
-      </>
-    ))}
-  </>
-);
+// Implementing the state spread pattern now for future safety, even though it is irrelevant now
+const reducer = ({ ordersCount, ...state }: LocalState) => ({
+  ...state,
+  ordersCount: ordersCount + 1,
+});
+
+export default () => {
+  const socket = useContext(SocketRootContext);
+  const [{ ordersCount }, dispatch] = useBackendSocket<LocalState, Action>(
+    socket,
+    ['newOrder'],
+    reducer,
+    { ordersCount: 0 }
+  );
+  return (
+    <>
+      <h1>Tickets: {ordersCount}</h1>
+    </>
+  );
+};

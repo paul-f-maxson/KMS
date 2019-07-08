@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "rootDir": "src",
+    "jsx": "preserve",
     "target": "es6",
     "module": "umd",
     "allowSyntheticDefaultImports": true,
