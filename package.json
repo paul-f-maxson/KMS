@@ -12,14 +12,16 @@
     "xstate": "^4.6.2"
   },
   "devDependencies": {
+    "@types/jest": "^24.0.15",
     "nodemon": "^1.19.1",
+    "ts-jest": "^24.0.2",
     "ts-node": "^8.3.0"
   },
   "scripts": {
     "tsc": "tsc",
     "dev": "NODE_ENV='development' && nodemon",
     "prod": "NODE_ENV='production' && tsc && node ./build/app.js",
-    "build-client": "cd client && yarn build",
+    "build-client": "cd src/client && yarn build",
     "test": "jest"
   }
 }

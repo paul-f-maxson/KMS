@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import SocketIOClient from 'socket.io-client';
-import App from './App';
+import App from './components/App';
 import * as serviceWorker from './serviceWorker';
 
 const socket = SocketIOClient.connect('/');

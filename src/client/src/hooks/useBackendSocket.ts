@@ -1,7 +1,7 @@
 import { useReducer } from 'react';
 
-import useSubscribe from './useSubscribe';
-import { Action } from '../types';
+import useSocketSubscribe from './useSocketSubscribe';
+import { Action } from '../../../types';
 
 /** Provides a local state value and function to send events to the backend.
  * @description The backend of this application comprises a server, a state machine, and a socket. The server forwards events sent to it to the machine. The machine emits messages over the various socket namespaces as events. These messages implement the action interface, and can be used to sync with the machine's state.
@@ -24,7 +24,7 @@ export default function<
 ) {
   const [localState, localDispatch] = useReducer(reducer, defaultLocalState);
 
-  useSubscribe(socket, socketEvents, localDispatch);
+  useSocketSubscribe(socket, socketEvents, localDispatch);
 
   const backendDispatch = () => {};
 

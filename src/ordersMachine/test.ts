@@ -1,6 +1,8 @@
 const { interpret } = require('xstate');
 
-const makeOrdersMachine = require('./');
+import makeOrdersMachine from '.';
+import { Order } from '../types';
+import { OrdersEvent } from './types';
 
 const makeDummyIO = () => {
   const mockEmit = jest.fn(() => {}).mockName('mockEmit');
@@ -18,10 +20,14 @@ const makeDummyIO = () => {
 
 test('add order emits update event', () => {
   const { io, mockEmit } = makeDummyIO();
-  const machine = makeOrdersMachine(io);
-  const order = { table: 100, meals: [{ seat: 1, dish: 'apples' }] };
-  const id = '1';
-  const event = { type: 'ADD', id, delay: 1000, order };
+  const machine = makeOrdersMachine((io as undefined) as SocketIO.Socket);
+  const order: Order = {
+    id: '1',
+    table: 100,
+    delay: 1000,
+    meals: [{ seat: 1, dish: 'apples' }],
+  };
+  const event: OrdersEvent = { type: 'ADD', order };
 
   interpret(machine)
     .start()
@@ -32,30 +38,38 @@ test('add order emits update event', () => {
 
 test('add order creates correctly namespaced io', () => {
   const { io, mockTo } = makeDummyIO();
-  const machine = makeOrdersMachine(io);
-  const order = { table: 100, meals: [{ seat: 1, dish: 'apples' }] };
-  const id = '1';
-  const event = { type: 'ADD', id, delay: 1000, order };
+  const machine = makeOrdersMachine((io as undefined) as SocketIO.Socket);
+  const order = {
+    id: '1',
+    delay: 1000,
+    table: 100,
+    meals: [{ seat: 1, dish: 'apples' }],
+  };
+  const event: OrdersEvent = { type: 'ADD', order };
 
   interpret(machine)
     .start()
     .send(event);
 
-  expect(mockTo).toHaveBeenCalledWith(`order:${event.id}`);
+  expect(mockTo).toHaveBeenCalledWith(`order:${event.order.id}`);
 });
 
 test('start order emits order update event', () => {
   const { io, mockToEmit } = makeDummyIO();
-  const machine = makeOrdersMachine(io);
-  const order = { table: 100, meals: [{ seat: 1, dish: 'apples' }] };
-  const id = '1';
-  const addEvent = { type: 'ADD', id, delay: 1000, order };
+  const machine = makeOrdersMachine((io as undefined) as SocketIO.Socket);
+  const order = {
+    id: '1',
+    delay: 1000,
+    table: 100,
+    meals: [{ seat: 1, dish: 'apples' }],
+  };
+  const addEvent: OrdersEvent = { type: 'ADD', order };
 
   const service = interpret(machine).start();
 
   service.send(addEvent);
 
-  service.send({ type: 'FIRE_ORDER', id: '1' });
+  service.send({ type: 'FIRE_ORDER', id: '1' } as OrdersEvent);
 
   expect(mockToEmit).toHaveBeenCalledWith('orderUpdate', { state: 'ready' });
 });

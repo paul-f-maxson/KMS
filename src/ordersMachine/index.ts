@@ -1,29 +1,17 @@
-const makeOrderMachine = require('./orderMachine');
+import makeOrderMachine, { OrderContext, OrderEvent } from './orderMachine';
 
 import XState, { Machine, assign, spawn, send, actions } from 'xstate';
 const { log } = actions;
 
 import { emit } from './actions';
-import { OrderContext, OrderEvent, Order } from './orderMachine';
-import { Actor } from 'xstate/lib/Actor';
 
-export interface OrdersContext {
-  orders: Map<string, Actor<OrderContext, OrderEvent>>;
-}
-
-export interface OrdersStateSchema {
-  states: {
-    active: {};
-  };
-}
-
-type AddOrderEvent = { type: 'ADD'; id: string; delay: number; order: Order };
-
-type OrderDoneEvent = { type: 'ORDER_DONE'; id: string };
-
-export type OrdersEvent = AddOrderEvent | OrderDoneEvent | OrderEvent;
-
-// export type OrdersEvent = { type: 'ADD'; delay: number; order: Order };
+import {
+  OrdersContext,
+  AddOrderEvent,
+  OrderDoneEvent,
+  OrdersStateSchema,
+  OrdersEvent,
+} from './types';
 
 export default (io: SocketIO.Socket) => {
   // CONTEXT MODIFICATION ACTIONS
@@ -32,23 +20,21 @@ export default (io: SocketIO.Socket) => {
     orders: (ctx, evt) => {
       // Import the machine to be used as an actor, passing it a socket namespace based on the id
       const [orderMachine, orderMachineDefaultContext] = makeOrderMachine(
-        io.to(`order:${evt.id}`)
+        io.to(`order:${evt.order.id}`)
       );
 
       // Spawn the new actor, passing the order and id in as context (without overiding any other context values the machine might have).
       // Add this new actor to the orders Map, keying it by the order's id
       ctx.orders.set(
-        evt.id,
+        evt.order.id,
 
         spawn(
           orderMachine.withContext({
             ...orderMachineDefaultContext,
-            order: evt.order,
-            id: evt.id,
-            delay: evt.delay,
+            ...evt.order,
           }),
 
-          evt.id
+          evt.order.id
         )
       );
 

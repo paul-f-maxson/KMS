@@ -6,12 +6,12 @@ const path = require('path');
 
 import { interpret } from 'xstate';
 const SocketIO = require('socket.io');
-import { OrdersContext, OrdersStateSchema } from './ordersMachine';
 
 // Routers
 const apiRouter = require('./routes/api');
 
 import makeOrdersMachine from './ordersMachine';
+import { OrdersContext, OrdersStateSchema } from './ordersMachine/types';
 
 const app = express();
 const server = Server(app);
