@@ -3,7 +3,7 @@ export interface Action {
   type: string;
 }
 
-type Meal = { seat: number; dish: string };
+type Meal = { seat: number; id: string; dish: string };
 
 export type Order = {
   id: string;

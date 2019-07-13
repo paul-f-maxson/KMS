@@ -2,8 +2,10 @@ import React, { useContext } from 'react';
 
 import { SocketRootContext } from '..';
 import useBackendSocket from '../hooks/useBackendSocket';
+
 import { Action, Order } from '../../../types';
-import Ticket from './Ticket';
+
+import Presentational from './Presentational';
 
 const reducerConfig: {
   [actionType: string]: React.Reducer<LocalState, Action>;
@@ -14,7 +16,6 @@ const reducerConfig: {
   }),
 };
 
-// Implementing the state spread pattern now for future safety, even though it is irrelevant now
 const reducer: React.Reducer<LocalState, Action> = (prevState, action) => {
   const fn = reducerConfig[action.type];
   return fn === undefined ? prevState : fn(prevState, action);
@@ -32,12 +33,5 @@ export default () => {
     reducer,
     { orders: [] }
   );
-  return (
-    <>
-      <h1>Tickets</h1>
-      {orders.map(order => (
-        <Ticket {...order} />
-      ))}
-    </>
-  );
+  return <Presentational orders={orders} />;
 };

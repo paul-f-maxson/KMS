@@ -1,8 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import SocketIOClient from 'socket.io-client';
+
 import App from './components/App';
+
+// import App from './components/MockApp';
+
 import * as serviceWorker from './serviceWorker';
+
+import 'typeface-roboto';
 
 const socket = SocketIOClient.connect('/');
 

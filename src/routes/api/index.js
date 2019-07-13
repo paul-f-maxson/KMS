@@ -20,7 +20,16 @@ fetch('http://localhost:5001/api/dispatch', {
   body: JSON.stringify({
     event: {
       type: 'ADD',
-      order: { table: 100, meals: [{ seat: 1, dish: 'apples' }] },
+      order: {
+    id: '1',
+    delay: 1000,
+    table: 101,
+    meals: [
+      { seat: 1, id: '11', dish: 'apples' },
+      { seat: 2, id: '12', dish: 'bananas' },
+      { seat: 3, id: '13', dish: 'grapes' },
+    ],
+  },
     },
   }),
 })
