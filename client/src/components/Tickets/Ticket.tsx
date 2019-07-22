@@ -1,5 +1,5 @@
 import React from 'react';
-import { Order } from '../../../../types';
+import { Order } from 'kms-types';
 import Paper from '@material-ui/core/Paper';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';

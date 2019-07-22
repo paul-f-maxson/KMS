@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
 
-import { SocketRootContext } from '../..';
+import { SocketRootContext } from '../SocketConnect';
 
 import useBackendSocket from '../../hooks/useBackendSocket';
 
-import { Action, Order } from '../../../../types';
+import { Action, Order } from 'kms-types';
 
 import Presentational from './Presentational';
 import reducer from './reducer';

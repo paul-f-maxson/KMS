@@ -1,4 +1,4 @@
-import { ValidRequest } from '../../types';
+import { ValidRequest } from 'kms-types';
 import { Request, Response } from 'express';
 
 const router = require('express').Router();

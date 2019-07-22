@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import useSocketSubscribe from './useSocketSubscribe';
-import { Order, OrdersEvent } from '../../../types';
+import { Order, OrdersEvent } from 'kms-types';
 
 /**
  * @summary Creates and renders a function component that simply calls the passed callback and renders nothing

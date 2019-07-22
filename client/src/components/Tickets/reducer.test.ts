@@ -1,5 +1,5 @@
 import reducer from './reducer';
-import { Order, OrdersEvent, AddOrderEvent } from '../../../../types';
+import { Order, OrdersEvent, AddOrderEvent } from 'kms-types';
 import { LocalState } from '.';
 
 test('reducer is pure', () => {

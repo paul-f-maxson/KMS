@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { SocketCallback } from '../../../types';
+import { SocketCallback } from 'kms-types';
 
 /**  Subscribe a listener to a socket event
  * @param socket - The socket on which to place the listener

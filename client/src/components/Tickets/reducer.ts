@@ -1,5 +1,5 @@
 import { LocalState } from '.';
-import { Action } from '../../../../types';
+import { Action } from 'kms-types';
 
 const reducerConfig: {
   [actionType: string]: React.Reducer<LocalState, Action>;

@@ -12,7 +12,7 @@ import {
   OrdersStateSchema,
   OrdersEvent,
   OrderEvent,
-} from '../types';
+} from 'kms-types';
 
 export default (io: SocketIO.Socket) => {
   // CONTEXT MODIFICATION ACTIONS

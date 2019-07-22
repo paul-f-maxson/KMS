@@ -1,7 +1,7 @@
 const { interpret } = require('xstate');
 
 import makeOrdersMachine from '.';
-import { Order, OrdersEvent } from '../types';
+import { Order, OrdersEvent } from 'kms-types';
 
 const makeDummyIO = () => {
   const mockEmit = jest.fn(() => {}).mockName('mockEmit');
