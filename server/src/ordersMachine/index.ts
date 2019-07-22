@@ -1,6 +1,6 @@
-import makeOrderMachine, { OrderContext, OrderEvent } from './orderMachine';
+import makeOrderMachine from './orderMachine';
 
-import XState, { Machine, assign, spawn, send, actions } from 'xstate';
+import { Machine, assign, spawn, send, actions } from 'xstate';
 const { log } = actions;
 
 import { emit } from './actions';
@@ -11,7 +11,8 @@ import {
   OrderDoneEvent,
   OrdersStateSchema,
   OrdersEvent,
-} from './types';
+  OrderEvent,
+} from '../types';
 
 export default (io: SocketIO.Socket) => {
   // CONTEXT MODIFICATION ACTIONS

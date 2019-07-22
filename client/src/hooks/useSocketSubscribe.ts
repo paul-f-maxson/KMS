@@ -27,6 +27,6 @@ export default function(
       return () => {
         socket.off(socketEvent, cb);
       };
-    });
+    }, [socket, socketEvents, listener]);
   });
 }

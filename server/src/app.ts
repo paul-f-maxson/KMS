@@ -1,17 +1,17 @@
 require('dotenv').config();
 
-const express = require('express');
+import express from 'express';
 const { Server } = require('http');
 const path = require('path');
 
-import { interpret } from 'xstate';
+import { interpret, Interpreter } from 'xstate';
 const SocketIO = require('socket.io');
 
 // Routers
 const apiRouter = require('./routes/api');
 
 import makeOrdersMachine from './ordersMachine';
-import { OrdersContext, OrdersStateSchema } from './ordersMachine/types';
+import { OrdersContext, OrdersStateSchema, OrdersEvent } from 'kms-types';
 
 const app = express();
 const server = Server(app);
@@ -28,12 +28,14 @@ io.on('connection', (socket: SocketIO.Socket) => {
 });
 
 // Initialize the FSM interpretation service
-app.locals.ordersService = interpret<OrdersContext, OrdersStateSchema>(
-  makeOrdersMachine(io)
-).start();
+app.locals.ordersService = interpret<
+  OrdersContext,
+  OrdersStateSchema,
+  OrdersEvent
+>(makeOrdersMachine(io)).start();
 
 // Serve the static files from the React app
-app.use(express.static(path.join(__dirname, 'client/build')));
+app.use(express.static(path.join(__dirname, 'client')));
 
 // Parse application/json from the body
 app.use(express.json());

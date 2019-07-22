@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Order } from '../../../types';
 
-import Presentational from './Presentational';
+import Presentational from './Tickets/Presentational';
 
 const orders: Array<Order> = [
   {

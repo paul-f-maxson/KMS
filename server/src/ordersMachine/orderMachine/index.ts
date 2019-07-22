@@ -1,5 +1,3 @@
-export * from './types';
-
 import XState, {
   Machine,
   send,
@@ -12,7 +10,8 @@ import { updateContext } from 'xstate/lib/utils';
 const { log } = actions;
 
 import { emit } from '../actions';
-import { OrderContext, OrderStateSchema, OrderEvent } from './types';
+
+import { OrderContext, OrderStateSchema, OrderEvent } from '../../types';
 
 export default (io: SocketIO.Socket) => {
   const emitFired = emit(io, 'orderUpdate', () => ({ state: 'ready' }));
