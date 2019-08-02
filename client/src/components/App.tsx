@@ -1,12 +1,15 @@
 import React from 'react';
 
-import SocketConnect from './SocketConnect';
+import ThemeWrapper from './ThemeWrapper';
 import Tickets from './Tickets';
 
+/** Render the large scale application componenets
+ *
+ */
 const App: React.FC = () => (
-  <SocketConnect>
+  <ThemeWrapper>
     <Tickets />
-  </SocketConnect>
+  </ThemeWrapper>
 );
 
 export default App;

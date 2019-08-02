@@ -1,22 +1,27 @@
+import debug from 'debug';
+const log = (id: string) => debug(`kms:order${id}:log`);
+
 import XState, {
   Machine,
   send,
   sendParent,
-  actions,
   StateMachine,
   MachineOptions,
 } from 'xstate';
-import { updateContext } from 'xstate/lib/utils';
-const { log } = actions;
+import * as XStateUtils from 'xstate/lib/utils';
 
-import { emit } from '../actions';
+import { socketSend } from '../actions';
 
 import { OrderContext, OrderStateSchema, OrderEvent } from 'kms-types';
 
-export default (io: SocketIO.Socket) => {
-  const emitFired = emit(io, 'orderUpdate', () => ({ state: 'ready' }));
+export default (io: SocketIO.Server, id: string) => {
+  const socketNsp = io.of(`/order:${id}`);
 
-  const emitStarted = emit(io, `orderUpdate`, () => ({ state: 'working' }));
+  const emitEvent = socketSend(
+    socketNsp,
+    // No need to send id because the io will be namespaced with the id
+    (_, evt) => evt
+  );
 
   const sendParentDone = sendParent(
     (ctx: OrderContext): XState.EventObject => ({
@@ -34,16 +39,11 @@ export default (io: SocketIO.Socket) => {
 
   const defaultOptions = {
     actions: {
-      log: () => {} /* log(
-        (ctx, evt) => ({
-          id: ctx.id,
-          evt,
-        }),
-        'order log:'
-      ) */,
+      log: (ctx: OrderContext, evt: OrderEvent) => {
+        log(ctx.id)(`event: ${JSON.stringify(evt)}`);
+      },
 
-      emitFired,
-      emitStarted,
+      emitEvent,
 
       sendParentDone,
     },
@@ -55,7 +55,7 @@ export default (io: SocketIO.Socket) => {
     guards: {},
     activities: {},
     services: {},
-    updater: updateContext,
+    updater: XStateUtils.updateContext,
   };
 
   const machine = Machine<OrderContext, OrderStateSchema, OrderEvent>(
@@ -76,17 +76,17 @@ export default (io: SocketIO.Socket) => {
 
         ready: {
           id: 'ready',
-          entry: ['log', 'emitFired'],
+          entry: ['log', 'emitEvent'],
           on: { ['START_ORDER']: 'working' },
         },
 
         working: {
           id: 'working',
-          entry: ['log', 'emitStarted'],
+          entry: ['log', 'emitEvent'],
           on: { ['BUMP_ORDER']: 'done' },
         },
 
-        done: { id: 'done', entry: 'log', type: 'final' },
+        done: { id: 'done', entry: ['log', 'emitEvent'], type: 'final' },
       },
 
       onDone: { actions: 'sendParentDone' },

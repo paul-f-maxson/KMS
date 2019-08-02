@@ -1,9 +1,11 @@
+import debug from 'debug';
+const log = debug('kms:ordersmachine:log');
+
 import makeOrderMachine from './orderMachine';
 
-import { Machine, assign, spawn, send, actions } from 'xstate';
-const { log } = actions;
+import { Machine, assign, spawn, send } from 'xstate';
 
-import { emit } from './actions';
+import { socketSend } from './actions';
 
 import {
   OrdersContext,
@@ -14,14 +16,16 @@ import {
   OrderEvent,
 } from 'kms-types';
 
-export default (io: SocketIO.Socket) => {
+export default (io: SocketIO.Server) => {
+  const socketNsp = io.of('/machine');
   // CONTEXT MODIFICATION ACTIONS
   // TODO: validate new order
   const addOrder = assign<OrdersContext, AddOrderEvent>({
     orders: (ctx, evt) => {
       // Import the machine to be used as an actor, passing it a socket namespace based on the id
       const [orderMachine, orderMachineDefaultContext] = makeOrderMachine(
-        io.to(`order:${evt.order.id}`)
+        io,
+        evt.order.id
       );
 
       // Spawn the new actor, passing the order and id in as context (without overiding any other context values the machine might have).
@@ -47,25 +51,19 @@ export default (io: SocketIO.Socket) => {
   const removeOrder = assign<OrdersContext, OrderDoneEvent>({
     orders: (ctx, evt) => {
       ctx.orders.delete(evt.id);
+
       return new Map(ctx.orders.entries());
     },
   });
 
   // CHILD ACTOR COMMUNICATION ACTIONS
-  const forwardToOrder = send<OrdersContext, OrderEvent>((ctx, evt) => evt, {
+  const forwardToOrder = send<OrdersContext, OrderEvent>((_, evt) => evt, {
     to: (ctx, evt) => ctx.orders.get(evt.id),
   });
 
   // SOCKET SIDE EFFECT ACTIONS
   // Forward the recieved event to the socket
-  const emitNewOrder = emit<OrdersContext, AddOrderEvent>(
-    io,
-    'newOrder',
-    (ctx, evt) => evt
-  );
-
-  // Forward the recieved event to the socket
-  const emitRemovedOrder = emit(io, 'orderRemoved', (ctx, evt) => evt);
+  const emitEvent = socketSend(socketNsp, (_, evt) => evt);
 
   return Machine<OrdersContext, OrdersStateSchema, OrdersEvent>(
     {
@@ -83,7 +81,7 @@ export default (io: SocketIO.Socket) => {
 
           on: {
             ADD: {
-              actions: ['log', 'addOrder', 'emitNewOrder'],
+              actions: ['log', 'addOrder', 'emitEvent'],
             },
 
             FIRE_ORDER: {
@@ -100,7 +98,7 @@ export default (io: SocketIO.Socket) => {
             },
 
             ORDER_DONE: {
-              actions: ['log', 'removeOrder', 'emitRemovedOrder'],
+              actions: ['log', 'removeOrder', 'emitEvent'],
             },
           },
         },
@@ -110,11 +108,10 @@ export default (io: SocketIO.Socket) => {
     {
       actions: {
         addOrder,
-        emitNewOrder,
         forwardToOrder,
         removeOrder,
-        emitRemovedOrder,
-        log: () => {} /* log((ctx, evt) => evt, 'controller log:') */,
+        emitEvent,
+        log: (_, evt) => log(`event: ${JSON.stringify(evt)}`),
       },
     }
   );

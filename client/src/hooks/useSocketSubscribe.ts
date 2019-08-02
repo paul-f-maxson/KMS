@@ -1,32 +1,35 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
+
+import SocketIOClient from 'socket.io-client';
 
 import { SocketCallback } from 'kms-types';
 
 /**  Subscribe a listener to a socket event
- * @param socket - The socket on which to place the listener
- * @param socketEvent - The event to listen for
+ * @param socketEvent - The room to listen to
  * @param listener - The function to subscribe to the event
+ * @returns null
  */
-export default function(
-  socket: SocketIOClient.Socket,
-  socketEvents: string[],
-  listener: Function
-) {
-  socketEvents.forEach(socketEvent => {
-    useEffect(() => {
-      const cb: SocketCallback = (firstArg, ...rest: any[]) => {
-        // Pass the socket event name and contents to the listener
-        listener({ socketEvent, ...firstArg, rest });
-      };
+export default function(room: string, listener: SocketCallback) {
+  // Memoize
+  const setupEventSubscription = useCallback(() => {
+    // Connect to namespace
+    const socket = SocketIOClient.connect(room);
 
-      // TODO: Frontend and backend should agree on a type contract for this callback. It could involve XState.Action
+    // Subscribe
+    socket.on('message', listener);
 
-      socket.on(socketEvent, cb);
+    // Function to unsubscribe this listener
+    return () => {
+      socket.off('message', listener);
+    };
+  }, [listener]);
 
-      // Function to unsubscribe this listener
-      return () => {
-        socket.off(socketEvent, cb);
-      };
-    }, [socket, socketEvents, listener]);
-  });
+  // Run on initial render and if any of the arguments to the hook change
+  useEffect(
+    // Returns unsubscriber
+    () => setupEventSubscription(),
+    [setupEventSubscription]
+  );
+
+  return; // null
 }

@@ -2,6 +2,8 @@ import React from 'react';
 
 import { Order } from 'kms-types';
 
+import ThemeWrapper from './ThemeWrapper';
+
 import Presentational from './Tickets/Presentational';
 
 const orders: Array<Order> = [
@@ -86,6 +88,10 @@ const orders: Array<Order> = [
   },
 ];
 
-const App: React.FC = () => <Presentational orders={orders} />;
+const App: React.FC = () => (
+  <ThemeWrapper>
+    <Presentational orders={orders} />
+  </ThemeWrapper>
+);
 
 export default App;

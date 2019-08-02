@@ -3,72 +3,95 @@ const { interpret } = require('xstate');
 import makeOrdersMachine from '.';
 import { Order, OrdersEvent } from 'kms-types';
 
-const makeDummyIO = () => {
-  const mockEmit = jest.fn(() => {}).mockName('mockEmit');
-  const mockToEmit = jest.fn(() => {}).mockName('mockToEmit');
+const makeMockIO = () => {
+  const mockSend = jest.fn(() => {}).mockName('mockSend');
+  const mockToSend = jest.fn(() => {}).mockName('mockToSend');
   const mockTo = jest
     .fn(() => ({
-      emit: mockToEmit,
+      send: mockToSend,
     }))
     .mockName('mockTo');
 
-  return { io: { to: mockTo, emit: mockEmit }, mockEmit, mockTo, mockToEmit };
+  return {
+    io: { to: mockTo, send: mockSend },
+    mockSend,
+    mockTo,
+    mockToSend,
+  };
 };
 
 // NOTE: Favor testing socket emmissions over directly testing the machine
 
-test('add order emits update event', () => {
-  const { io, mockEmit } = makeDummyIO();
-  const machine = makeOrdersMachine((io as unknown) as SocketIO.Socket);
-  const order: Order = {
-    id: '1',
-    table: 100,
-    delay: 1000,
-    meals: [{ seat: 1, id: '1', dish: 'apples' }],
-  };
-  const event: OrdersEvent = { type: 'ADD', order };
+describe('ordersMachine', () => {
+  test('add order emits update event', () => {
+    const { io, mockSend } = makeMockIO();
+    const machine = makeOrdersMachine((io as unknown) as SocketIO.Namespace);
+    const order: Order = {
+      id: '1',
+      table: 100,
+      delay: 1000,
+      meals: [{ seat: 1, id: '1', dish: 'apples' }],
+    };
+    const event: OrdersEvent = { type: 'ADD', order };
 
-  interpret(machine)
-    .start()
-    .send(event);
+    interpret(machine)
+      .start()
+      .send(event);
 
-  expect(mockEmit).toHaveBeenCalledWith('newOrder', event);
+    expect(mockSend).toHaveBeenNthCalledWith(1, event);
+  });
+
+  test('add order creates correctly namespaced io', () => {
+    const { io, mockTo } = makeMockIO();
+    const machine = makeOrdersMachine((io as unknown) as SocketIO.Namespace);
+    const order = {
+      id: '1',
+      delay: 1000,
+      table: 100,
+      meals: [{ seat: 1, id: '1', dish: 'apples' }],
+    };
+    const event: OrdersEvent = { type: 'ADD', order };
+
+    interpret(machine)
+      .start()
+      .send(event);
+
+    expect(mockTo).toHaveBeenCalledWith(`order:${event.order.id}`);
+  });
 });
 
-test('add order creates correctly namespaced io', () => {
-  const { io, mockTo } = makeDummyIO();
-  const machine = makeOrdersMachine((io as unknown) as SocketIO.Socket);
-  const order = {
-    id: '1',
-    delay: 1000,
-    table: 100,
-    meals: [{ seat: 1, id: '1', dish: 'apples' }],
-  };
-  const event: OrdersEvent = { type: 'ADD', order };
+describe('orderMachine', () => {
+  test('emits correct order update events', () => {
+    const { io, mockToSend } = makeMockIO();
+    const machine = makeOrdersMachine((io as unknown) as SocketIO.Namespace);
+    const order = {
+      id: '1',
+      delay: 1000,
+      table: 100,
+      meals: [{ seat: 1, id: '1', dish: 'apples' }],
+    };
+    const addEvent: OrdersEvent = { type: 'ADD', order };
 
-  interpret(machine)
-    .start()
-    .send(event);
+    const service = interpret(machine).start();
 
-  expect(mockTo).toHaveBeenCalledWith(`order:${event.order.id}`);
-});
+    service.send(addEvent);
 
-test('start order emits order update event', () => {
-  const { io, mockToEmit } = makeDummyIO();
-  const machine = makeOrdersMachine((io as unknown) as SocketIO.Socket);
-  const order = {
-    id: '1',
-    delay: 1000,
-    table: 100,
-    meals: [{ seat: 1, id: '1', dish: 'apples' }],
-  };
-  const addEvent: OrdersEvent = { type: 'ADD', order };
+    // FIRE
+    const fireEvent = { type: 'FIRE_ORDER', id: '1' };
+    service.send(fireEvent);
 
-  const service = interpret(machine).start();
+    expect(mockToSend).toHaveBeenNthCalledWith(1, fireEvent);
 
-  service.send(addEvent);
+    // START
+    const startEvent = { type: 'START_ORDER', id: '1' };
+    service.send(startEvent);
 
-  service.send({ type: 'FIRE_ORDER', id: '1' } as OrdersEvent);
+    expect(mockToSend).toHaveBeenNthCalledWith(2, startEvent);
 
-  expect(mockToEmit).toHaveBeenCalledWith('orderUpdate', { state: 'ready' });
+    // BUMP
+    const bumpEvent = { type: 'BUMP_ORDER', id: '1' };
+    service.send(bumpEvent);
+
+    expect(mockToSend).toHaveBeenNthCalledWith(3, bumpEvent);
+  });
 });
