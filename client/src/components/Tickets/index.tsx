@@ -7,18 +7,20 @@ import useBackendSocket from '../../hooks/useBackendSocket';
 import { Action, Order } from 'kms-types';
 
 import Presentational from './Presentational';
+
 import reducer from './reducer';
 
 export type LocalState = Array<Order>;
 
 const Tickets: React.FC = () => {
-  const socket = useContext(SocketRootContext);
-  const [orders, dispatch] = useBackendSocket<LocalState, Action>(
-    socket,
-    ['newOrder'],
+  const io = useContext(SocketRootContext);
+  const [orders /* , dispatch */] = useBackendSocket<LocalState, Action>(
+    io,
+    '/machine',
     reducer,
     []
   );
+
   return <Presentational orders={orders} />;
 };
 

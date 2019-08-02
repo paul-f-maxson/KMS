@@ -3,6 +3,6 @@
   "license": "MIT",
   "scripts": {
     "build-client": "cd client && yarn build",
-    "build": "cp client/src/build/* server/src/client"
+    "build": "cp -r client/build/* server/src/client"
   }
 }

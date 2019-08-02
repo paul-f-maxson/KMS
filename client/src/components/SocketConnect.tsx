@@ -1,13 +1,12 @@
 import React from 'react';
 import SocketIOClient from 'socket.io-client';
-const socket = SocketIOClient.connect('/');
 
-export const SocketRootContext = React.createContext(socket);
+export const SocketRootContext = React.createContext(SocketIOClient);
 
-const SocketConnect: React.FC = ({ children }) => (
-  <SocketRootContext.Provider value={socket}>
+const SocketConnectWrapper: React.FC = ({ children }) => (
+  <SocketRootContext.Provider value={SocketIOClient}>
     {children}
   </SocketRootContext.Provider>
 );
 
-export default SocketConnect;
+export default SocketConnectWrapper;

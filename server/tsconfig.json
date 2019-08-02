@@ -9,7 +9,8 @@
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "preserveConstEnums": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "outDir": "./build"
   },
   "include": ["**/*"],
   "exclude": ["node_modules", "client/**/*", "**/*.spec.ts"]
