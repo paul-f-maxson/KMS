@@ -1,14 +1,14 @@
 import React from 'react';
 
 import ThemeWrapper from './ThemeWrapper';
-import Tickets from './Tickets';
+import Layout from './Layout';
 
 /** Render the large scale application componenets
  *
  */
 const App: React.FC = () => (
   <ThemeWrapper>
-    <Tickets />
+    <Layout />
   </ThemeWrapper>
 );
 

@@ -81,7 +81,7 @@ export default (io: SocketIO.Server) => {
 
           on: {
             ADD: {
-              actions: ['log', 'addOrder', 'emitEvent'],
+              actions: ['log', 'emitEvent', 'addOrder'],
             },
 
             FIRE_ORDER: {
@@ -89,7 +89,6 @@ export default (io: SocketIO.Server) => {
             },
 
             START_ORDER: {
-              target: '.',
               actions: ['log', 'forwardToOrder'],
             },
 

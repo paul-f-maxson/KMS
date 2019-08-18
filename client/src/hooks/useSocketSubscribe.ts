@@ -22,7 +22,7 @@ export default function(room: string, listener: SocketCallback) {
     return () => {
       socket.off('message', listener);
     };
-  }, [listener]);
+  }, [listener, room]);
 
   // Run on initial render and if any of the arguments to the hook change
   useEffect(

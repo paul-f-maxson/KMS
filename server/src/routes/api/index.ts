@@ -12,7 +12,7 @@ const router = express.Router();
 router.use(express.json());
 
 const isValidRequest = (req: any): req is DispatchRequest =>
-  req.body && req.body.type && req.body.order;
+  req.body && req.body.type;
 
 // Forward body of the request to the machine as an event
 router.post('/dispatch', (req: Request, res: Response) => {
@@ -21,11 +21,7 @@ router.post('/dispatch', (req: Request, res: Response) => {
     req.app.locals.ordersService.send(req.body);
     res.status(200).end();
   } else {
-    error(
-      `invalid request recieved at api/dispatch\n\trequest: ${JSON.stringify(
-        req
-      )}`
-    );
+    error(`invalid request recieved at api/dispatch\n\trequest: ${req}`);
     res.status(400).send('Invalid request');
   }
 });

@@ -71,19 +71,19 @@ export default (io: SocketIO.Server, id: string) => {
             send('FIRE_ORDER', { delay: (ctx: OrderContext) => ctx.delay }),
           ],
 
-          on: { ['FIRE_ORDER']: 'ready' },
+          on: { FIRE_ORDER: 'ready' },
         },
 
         ready: {
           id: 'ready',
           entry: ['log', 'emitEvent'],
-          on: { ['START_ORDER']: 'working' },
+          on: { START_ORDER: 'working' },
         },
 
         working: {
           id: 'working',
           entry: ['log', 'emitEvent'],
-          on: { ['BUMP_ORDER']: 'done' },
+          on: { BUMP_ORDER: 'done' },
         },
 
         done: { id: 'done', entry: ['log', 'emitEvent'], type: 'final' },
