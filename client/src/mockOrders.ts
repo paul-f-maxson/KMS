@@ -1,12 +1,4 @@
-import React from 'react';
-
-import { Order } from 'kms-types';
-
-import ThemeWrapper from './ThemeWrapper';
-
-import Presentational from './Tickets/Presentational';
-
-const orders: Array<Order> = [
+export default [
   {
     id: '1',
     delay: 1000,
@@ -87,11 +79,3 @@ const orders: Array<Order> = [
     ],
   },
 ];
-
-const App: React.FC = () => (
-  <ThemeWrapper>
-    <Presentational orders={orders} />
-  </ThemeWrapper>
-);
-
-export default App;

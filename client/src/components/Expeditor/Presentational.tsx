@@ -4,29 +4,27 @@ import { Order } from 'kms-types';
 
 import Ticket from './Ticket';
 
-import { styled } from '@material-ui/styles';
-
 import Container from '@material-ui/core/Container';
-import GridList from '@material-ui/core/GridList';
-import ListItem from '@material-ui/core/ListItem';
+import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 
-const ColumnGridList = styled(GridList)({
-  flexDirection: 'column',
-});
-
 const TicketList: React.FC<{ orders: Array<Order> }> = ({ orders }) => (
-  <ColumnGridList cellHeight="auto">
-    {orders.map(order => (
-      /* Not using a Fragment here because GridList does not accept them as children */
-      <Box key={order.id}>
-        <ListItem>
+  <List>
+    <Box
+      height="80vh"
+      display="flex"
+      flexDirection="column"
+      flexWrap="wrap"
+      alignContent="flex-start"
+    >
+      {orders.map(order => (
+        <Box p="0.25rem" component="li" key={order.id}>
           <Ticket {...order} />
-        </ListItem>
-      </Box>
-    ))}
-  </ColumnGridList>
+        </Box>
+      ))}
+    </Box>
+  </List>
 );
 
 const NoTickets: React.FC = () => (
@@ -45,7 +43,7 @@ const NoTickets: React.FC = () => (
 
 const Presentational: React.FC<{ orders: Array<Order> }> = ({ orders }) => (
   <Container>
-    <Box p="1rem" height="100vh" display="flex" flexDirection="column">
+    <Box display="flex" flexDirection="column">
       <Typography variant="h1">Tickets</Typography>
 
       {orders.length === 0 ? <NoTickets /> : <TicketList orders={orders} />}

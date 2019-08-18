@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { Order } from 'kms-types';
+
 import Paper from '@material-ui/core/Paper';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -14,36 +16,16 @@ const TicketContent: React.FC<BoxProps> = ({ children, ...restProps }) => (
 );
 
 const Ticket: React.FC<Order> = ({ table, meals }) => (
-  <Paper>
-    <Box width="15rem">
+  <Box width="12rem">
+    <Paper>
       {/* Table number */}
       <TicketContent py="0.7rem">
         <Typography variant="h2">{table}</Typography>
       </TicketContent>
 
-      <Divider />
+      <Divider variant="fullWidth" />
 
       <TicketContent>
-        {/* Ticket header labels */}
-        <Box
-          display="flex"
-          width="100%"
-          justifyContent="space-between"
-          py="0.7rem"
-        >
-          {/* Dish */}
-          <Box>
-            <Typography variant="h3">Dish</Typography>
-          </Box>
-
-          {/* Seat */}
-          <Box>
-            <Typography variant="h3">Seat</Typography>
-          </Box>
-        </Box>
-
-        <Divider />
-
         {/* Meals */}
         <List>
           {meals.map(({ seat, dish, id }, index) => (
@@ -54,22 +36,18 @@ const Ticket: React.FC<Order> = ({ table, meals }) => (
                 {/* Meal content */}
                 <Box display="flex" width="100%" justifyContent="space-between">
                   {/* Dish */}
-                  <Box>
-                    <Typography variant="body1">{dish}</Typography>
-                  </Box>
+                  <Typography variant="body1">{dish}</Typography>
 
                   {/* Seat */}
-                  <Box>
-                    <Typography variant="h4">{seat}</Typography>
-                  </Box>
+                  <Typography variant="h4">{seat}</Typography>
                 </Box>
               </ListItem>
             </React.Fragment>
           ))}
         </List>
       </TicketContent>
-    </Box>
-  </Paper>
+    </Paper>
+  </Box>
 );
 
 export default Ticket;

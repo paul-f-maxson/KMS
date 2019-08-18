@@ -8,6 +8,8 @@ import Presentational from './Presentational';
 
 import reducer from './reducer';
 
+import mockOrders from '../../mockOrders';
+
 export type LocalState = Array<Order>;
 
 const Tickets: React.FC = () => {
@@ -17,7 +19,7 @@ const Tickets: React.FC = () => {
     []
   );
 
-  return <Presentational orders={orders} />;
+  return <Presentational orders={mockOrders} />;
 };
 
 export default Tickets;
