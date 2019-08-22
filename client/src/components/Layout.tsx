@@ -63,7 +63,7 @@ const Layout: React.FC = () => {
   const [activeTabIndex, handleTabChange] = useTabs(1);
 
   return (
-    <>
+    <Box pt={2}>
       {/* Tab selection UI */}
       <BottomAppBar color="primary">
         <Tabs
@@ -89,7 +89,7 @@ const Layout: React.FC = () => {
           </TabPanel>
         )
       )}
-    </>
+    </Box>
   );
 };
 
