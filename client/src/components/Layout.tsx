@@ -13,6 +13,7 @@ import Expeditor from './Expeditor';
 const Dashboard = () => <h1>Dashboard</h1>;
 const PointOfSale = () => <h1>Point of Sale</h1>;
 
+// OPTIMIZE: This should not have to re-render so deeply every time the tab changes. Not really a big deal because tab changes are not frequent, but still not good form. Maybe memoize the tabs?
 interface TabPanelProps {
   children?: React.ReactNode;
   index: any;
@@ -46,7 +47,7 @@ const useTabs = (initialIndex: number) => {
   const [activeTabIndex, setTabValue] = useState(initialIndex);
 
   const handleTabChange = useCallback(
-    (event: React.ChangeEvent<{}>, newTabValue: number) => {
+    (_: React.ChangeEvent<{}>, newTabValue: number) => {
       setTabValue(newTabValue);
     },
     []
@@ -63,15 +64,7 @@ const Layout: React.FC = () => {
 
   return (
     <>
-      <TabPanel value={activeTabIndex} index={0}>
-        <Dashboard />
-      </TabPanel>
-      <TabPanel value={activeTabIndex} index={1}>
-        <Expeditor />
-      </TabPanel>
-      <TabPanel value={activeTabIndex} index={2}>
-        <PointOfSale />
-      </TabPanel>
+      {/* Tab selection UI */}
       <BottomAppBar color="primary">
         <Tabs
           value={activeTabIndex}
@@ -83,11 +76,19 @@ const Layout: React.FC = () => {
             ) => void
           }
         >
-          <Tab label="Dash" id="tab-0" />
-          <Tab label="Expo" id="tab-1" />
-          <Tab label="POS" id="tab-2" />
+          {['Dash', 'Expo', 'POS'].map((label, index) => (
+            <Tab label={label} id={`tab-${index}`} />
+          ))}
         </Tabs>
       </BottomAppBar>
+      {/* The tabs themselves */}
+      {[<Dashboard />, <Expeditor />, <PointOfSale />].map(
+        (component, index) => (
+          <TabPanel value={activeTabIndex} index={index}>
+            {component}
+          </TabPanel>
+        )
+      )}
     </>
   );
 };
