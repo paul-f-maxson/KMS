@@ -12,7 +12,7 @@ import mockOrders from '../../mockOrders';
 
 export type LocalState = Array<Order>;
 
-const Tickets: React.FC = () => {
+const Expeditor: React.FC = () => {
   const [orders /* , dispatch */] = useBackendSocket<LocalState, Action>(
     '/machine',
     reducer,
@@ -22,4 +22,4 @@ const Tickets: React.FC = () => {
   return <Presentational orders={mockOrders} />;
 };
 
-export default Tickets;
+export default Expeditor;

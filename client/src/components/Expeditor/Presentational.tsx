@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Order } from 'kms-types';
 
-import Ticket from './Ticket';
+import Ticket from '../Ticket';
 
 import Container from '@material-ui/core/Container';
 import List from '@material-ui/core/List';
@@ -19,7 +19,7 @@ const TicketList: React.FC<{ orders: Array<Order> }> = ({ orders }) => (
       alignContent="flex-start"
     >
       {orders.map(order => (
-        <Box p="0.25rem" component="li" key={order.id}>
+        <Box p={0.5} component="li" key={order.id}>
           <Ticket {...order} />
         </Box>
       ))}
@@ -44,7 +44,9 @@ const NoTickets: React.FC = () => (
 const Presentational: React.FC<{ orders: Array<Order> }> = ({ orders }) => (
   <Container>
     <Box display="flex" flexDirection="column">
-      <Typography variant="h1">Tickets</Typography>
+      <Typography variant="h3" component="h1">
+        Expeditor
+      </Typography>
 
       {orders.length === 0 ? <NoTickets /> : <TicketList orders={orders} />}
     </Box>

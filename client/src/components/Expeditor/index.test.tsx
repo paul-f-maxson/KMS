@@ -2,14 +2,14 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { act } from 'react-dom/test-utils';
 
-import Tickets from '.';
+import Expeditor from '.';
 
 import Presentational from './Presentational';
 
 describe('<Tickets />', () => {
   it('Passes empty orders array to <Presentational /> by default', () => {
     act(() => {
-      const $ = mount(<Tickets />);
+      const $ = mount(<Expeditor />);
 
       expect($.find(Presentational).props().orders).toEqual([]);
 
@@ -26,7 +26,7 @@ describe('<Tickets />', () => {
       meals: [{ seat: 1, id: '11', dish: 'apples' }],
     };
 
-    const Test: React.FC = () => <Tickets />;
+    const Test: React.FC = () => <Expeditor />;
 
     act(() => {
       const $ = mount(<Test />);

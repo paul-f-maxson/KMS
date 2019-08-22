@@ -4,7 +4,11 @@ export default [
     delay: 1000,
     table: 101,
     meals: [
-      { seat: 1, id: '11', dish: 'apples' },
+      {
+        seat: 1,
+        id: '11',
+        dish: 'apples with cinnamon and butter and lots of sugar',
+      },
       { seat: 2, id: '12', dish: 'bananas' },
       { seat: 3, id: '13', dish: 'grapes' },
     ],
