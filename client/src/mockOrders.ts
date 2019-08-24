@@ -11,6 +11,14 @@ export default [
       },
       { seat: 2, id: '12', dish: 'bananas' },
       { seat: 3, id: '13', dish: 'grapes' },
+      /* { seat: 4, id: '14', dish: 'apples' },
+      { seat: 5, id: '15', dish: 'bananas' },
+      { seat: 6, id: '16', dish: 'grapes' },
+
+      { seat: 7, id: '17', dish: 'grapes' },
+      { seat: 8, id: '18', dish: 'apples' },
+      { seat: 9, id: '19', dish: 'bananas' },
+      { seat: 10, id: '20', dish: 'grapes' }, */
     ],
   },
   {

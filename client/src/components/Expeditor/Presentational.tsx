@@ -4,7 +4,6 @@ import { Order } from 'kms-types';
 
 import Ticket from '../Ticket';
 
-import Container from '@material-ui/core/Container';
 import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
@@ -42,15 +41,7 @@ const NoTickets: React.FC = () => (
 );
 
 const Presentational: React.FC<{ orders: Array<Order> }> = ({ orders }) => (
-  <Container>
-    <Box display="flex" flexDirection="column">
-      <Typography variant="h3" component="h1">
-        Expeditor
-      </Typography>
-
-      {orders.length === 0 ? <NoTickets /> : <TicketList orders={orders} />}
-    </Box>
-  </Container>
+  <>{orders.length === 0 ? <NoTickets /> : <TicketList orders={orders} />}</>
 );
 
 export default Presentational;

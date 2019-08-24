@@ -1,95 +1,50 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 
 import AppBar from '@material-ui/core/AppBar';
-import Box from '@material-ui/core/Box';
 
 import { styled } from '@material-ui/styles';
 
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
+import Container from '@material-ui/core/Container';
+
+import { makeTabComponents, TabPanelsConfigType } from './TabPanels';
 
 import Expeditor from './Expeditor';
+import Dashboard from './Dashboard';
+import useTabs from '../hooks/useTabs';
 
-const Dashboard = () => <h1>Dashboard</h1>;
-const PointOfSale = () => <h1>Point of Sale</h1>;
-
-// OPTIMIZE: This should not have to re-render so deeply every time the tab changes. Not really a big deal because tab changes are not frequent, but still not good form. Maybe memoize the tabs?
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: any;
-  value: any;
-}
-
-// A Box that hides if its value prop does not match its index prop
-const TabPanel: React.FC<TabPanelProps> = ({
-  children,
-  value,
-  index,
-  ...other
-}) => (
-  <Box
-    role="tabpanel"
-    hidden={value !== index}
-    id={`tabpanel-${index}`}
-    aria-labelledby={`tab-${index}`}
-    {...other}
-  >
-    {children}
-  </Box>
-);
+const PointOfSale = () => null;
 
 const BottomAppBar = styled(AppBar)({
   top: 'auto',
   bottom: 0,
 });
 
-const useTabs = (initialIndex: number) => {
-  const [activeTabIndex, setTabValue] = useState(initialIndex);
+const uiPanelsConfig: TabPanelsConfigType = [
+  [Dashboard, 'Dashboard', 'DASH'],
+  [Expeditor, 'Expeditor', 'EXPO'],
+  [PointOfSale, 'Point of Sale', 'POS'],
+];
 
-  const handleTabChange = useCallback(
-    (_: React.ChangeEvent<{}>, newTabValue: number) => {
-      setTabValue(newTabValue);
-    },
-    []
-  );
+const [PanelSelectionTabs, TabPanels] = makeTabComponents(uiPanelsConfig);
 
-  return [activeTabIndex, handleTabChange];
-};
-
-/** The base structure of the UI (ie the tabbing system)
+/** The base structure of the UI (i.e. the tabbing system)
  */
 const Layout: React.FC = () => {
   // NOTE: Change default tab back to 0 when done working on this
-  const [activeTabIndex, handleTabChange] = useTabs(1);
+  const [activeTabIndex, handleTabChange] = useTabs(0);
 
   return (
-    <Box pt={2}>
+    <Container>
+      {/* The tabs themselves */}
+      <TabPanels activeTabIndex={activeTabIndex} />
       {/* Tab selection UI */}
       <BottomAppBar color="primary">
-        <Tabs
-          value={activeTabIndex}
-          onChange={
-            // Without cast the handler's type gets unioned with number for some reason
-            handleTabChange as (
-              event: React.ChangeEvent<{}>,
-              newTabValue: number
-            ) => void
-          }
-        >
-          {['Dash', 'Expo', 'POS'].map((label, index) => (
-            <Tab label={label} id={`tab-${index}`} />
-          ))}
-        </Tabs>
+        <PanelSelectionTabs
+          activeTabIndex={activeTabIndex}
+          handleTabChange={handleTabChange}
+        />
       </BottomAppBar>
-      {/* The tabs themselves */}
-      {[<Dashboard />, <Expeditor />, <PointOfSale />].map(
-        (component, index) => (
-          <TabPanel value={activeTabIndex} index={index}>
-            {component}
-          </TabPanel>
-        )
-      )}
-    </Box>
+    </Container>
   );
 };
 
