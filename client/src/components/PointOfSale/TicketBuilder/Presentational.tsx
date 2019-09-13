@@ -13,6 +13,7 @@ const TicketBuilderForm: React.FC<{
   handleTableChange: ChangeEventHandler<HTMLInputElement>;
   handleSeatNumberChange: ChangeEventHandler<HTMLInputElement>;
   handleNewMealClick: MouseEventHandler<HTMLButtonElement>;
+  handleMealChangeClick: MouseEventHandler<HTMLButtonElement>;
   handleOrderSubmitClick: MouseEventHandler<HTMLButtonElement>;
 }> = ({
   currentSeatNumber,
@@ -20,7 +21,8 @@ const TicketBuilderForm: React.FC<{
   handleTableChange,
   handleSeatNumberChange,
   handleNewMealClick,
-  handleOrderSubmitClick: handleOrderSubmit,
+  handleMealChangeClick,
+  handleOrderSubmitClick,
 }) => (
   <Paper>
     <Box p={1}>
@@ -67,17 +69,32 @@ const TicketBuilderForm: React.FC<{
           <List>
             <Box display="flex" flexDirection="column">
               <ListItem>
-                <Button fullWidth variant="outlined">
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  value={'Apples'}
+                  onClick={handleMealChangeClick}
+                >
                   Apples
                 </Button>
               </ListItem>
               <ListItem>
-                <Button fullWidth variant="outlined">
+                <Button
+                  value={'Bananas'}
+                  fullWidth
+                  variant="outlined"
+                  onClick={handleMealChangeClick}
+                >
                   Bananas
                 </Button>
               </ListItem>
               <ListItem>
-                <Button fullWidth variant="outlined">
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  value={'Grapes'}
+                  onClick={handleMealChangeClick}
+                >
                   Grapes
                 </Button>
               </ListItem>
@@ -91,7 +108,7 @@ const TicketBuilderForm: React.FC<{
             size="large"
             variant="contained"
             color="primary"
-            onClick={handleOrderSubmit}
+            onClick={handleOrderSubmitClick}
           >
             Submit Order
           </Button>

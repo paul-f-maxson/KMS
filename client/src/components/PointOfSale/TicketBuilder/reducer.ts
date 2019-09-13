@@ -15,6 +15,8 @@ export const defaultState = {
 
 const on: {
   [actionType: string]: React.Reducer<LocalState, LocalAction>;
-} = {};
+} = {
+  CHANGE_MEAL: (prevState, action) => ({ ...prevState, dish: action.dish }),
+};
 
 export default makeReducer(on);
