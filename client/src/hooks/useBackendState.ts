@@ -9,7 +9,7 @@ import useSocketSubscribe from './useSocketSubscribe';
  * @param socketEvent - The event to listen for on the socket
  * @param reducer - A function to generate a new state from old state based on the event received from the backend machine
  * @param defaultLocalState
- * @returns a tuple of a local state value and function to dispatch events against the backend machine
+ * @returns a local state value
  */
 export default function<IState, IEvent>(
   room: string,
@@ -32,13 +32,5 @@ export default function<IState, IEvent>(
 
   useSocketSubscribe(room, listener);
 
-  /**
-   *@summary Send events to the core app state store
-   */
-  const backendDispatch = () => {};
-
-  return [localState, backendDispatch] as [
-    IState,
-    Function /* COMBAK when backendDispatch is done and update this type */
-  ];
+  return localState;
 }

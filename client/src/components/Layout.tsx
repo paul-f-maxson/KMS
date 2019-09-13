@@ -10,9 +10,9 @@ import { makeTabComponents, TabPanelsConfigType } from './TabPanels';
 
 import Expeditor from './Expeditor';
 import Dashboard from './Dashboard';
-import useTabs from '../hooks/useTabs';
+import PointOfSale from './PointOfSale';
 
-const PointOfSale = () => null;
+import useTabs from '../hooks/useTabs';
 
 const BottomAppBar = styled(AppBar)({
   top: 'auto',
@@ -31,7 +31,7 @@ const [PanelSelectionTabs, TabPanels] = makeTabComponents(uiPanelsConfig);
  */
 const Layout: React.FC = () => {
   // NOTE: Change default tab back to 0 when done working on this
-  const [activeTabIndex, handleTabChange] = useTabs(0);
+  const [activeTabIndex, handleTabChange] = useTabs(2);
 
   return (
     <Container>

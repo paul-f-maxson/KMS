@@ -1,20 +1,14 @@
 import { LocalState } from '.';
 import { Action } from 'kms-types';
 
+import makeReducer from '../../utils/makeReducer';
+
+export type LocalAction = Action<'ADD'>;
+
 const on: {
-  [actionType: string]: React.Reducer<LocalState, Action>;
+  [actionType: string]: React.Reducer<LocalState, LocalAction>;
 } = {
   ADD: (orders, action) => [...orders, action.order],
 };
 
-const reducer: React.Reducer<LocalState, Action> = (prevState, action) => {
-  /* console.log(
-    `reducer:\n\tprevState: ${JSON.stringify(
-      prevState
-    )}\n\taction: ${JSON.stringify(action)}`
-  ); */
-  const fn = on[action.type];
-  return fn === undefined ? prevState : fn(prevState, action);
-};
-
-export default reducer;
+export default makeReducer(on);

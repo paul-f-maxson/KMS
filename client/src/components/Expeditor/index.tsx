@@ -1,8 +1,8 @@
 import React from 'react';
 
-import useBackendSocket from '../../hooks/useBackendSocket';
+import useBackendSocket from '../../hooks/useBackendState';
 
-import { Action, Order } from 'kms-types';
+import { Order } from 'kms-types';
 
 import Presentational from './Presentational';
 
@@ -12,12 +12,10 @@ import mockOrders from '../../mockOrders';
 
 export type LocalState = Array<Order>;
 
+const defaultLocalState: LocalState = [];
+
 const Expeditor: React.FC = () => {
-  const [orders /* , dispatch */] = useBackendSocket<LocalState, Action>(
-    '/machine',
-    reducer,
-    []
-  );
+  const orders = useBackendSocket('/machine', reducer, defaultLocalState);
 
   return <Presentational orders={mockOrders} />;
 };

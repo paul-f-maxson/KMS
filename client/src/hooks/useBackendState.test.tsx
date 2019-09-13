@@ -1,4 +1,4 @@
-import useBackendSocket from './useBackendSocket';
+import useBackendState from './useBackendState';
 import { act } from 'react-dom/test-utils';
 import React, { useEffect } from 'react';
 import { mount } from 'enzyme';
@@ -16,7 +16,7 @@ describe('useBackendSocket', () => {
     const Spy: React.FC<{ p: any }> = ({ p }) => null;
 
     const Test: React.FC = () => {
-      const [localState] = useBackendSocket('A', mockReducer, 0);
+      const localState = useBackendState('A', mockReducer, 0);
 
       useEffect(() => {
         // socket.send(event);
