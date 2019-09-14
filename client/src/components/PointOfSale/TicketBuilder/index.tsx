@@ -1,15 +1,14 @@
 import React, {
   ChangeEventHandler,
   MouseEventHandler,
-  useReducer,
   useCallback,
 } from 'react';
 
 import { Order, Meal } from 'kms-types';
 
-import { LocalAction as OrderAction } from '../reducer';
+import { LocalAction as OrderAction } from '../orderReducer';
 
-import reducer, { defaultState as defaultMeal } from './reducer';
+import { LocalAction as MealAction } from '../currentMealReducer';
 
 import Presentational from './Presentational';
 import useBackendDispatch from '../../../hooks/useBackendDispatch';
@@ -19,10 +18,10 @@ export type LocalState = Meal;
 const TicketBuilderForm: React.FC<{
   order: Order;
   orderDispatch: React.Dispatch<OrderAction>;
-}> = ({ order, orderDispatch }) => {
+  currentMeal: Meal;
+  currentMealDispatch: React.Dispatch<MealAction>;
+}> = ({ order, orderDispatch, currentMeal, currentMealDispatch }) => {
   const backendDispatch = useBackendDispatch();
-
-  const [currentMeal, currentMealDispatch] = useReducer(reducer, defaultMeal);
 
   const handleTableChange = useCallback<ChangeEventHandler<HTMLInputElement>>(
     ({ target: { value } }) => {
@@ -31,13 +30,14 @@ const TicketBuilderForm: React.FC<{
     [orderDispatch]
   );
 
+  // OPTIMIZE: Remove currentMeal dependency
   const handleNewMealClick = useCallback<
     MouseEventHandler<HTMLButtonElement>
   >(() => {
-    orderDispatch({ type: 'ADD_MEAL', ...currentMeal });
+    orderDispatch({ type: 'ADD_MEAL', newMeal: currentMeal });
 
     currentMealDispatch({ type: 'CLEAR' });
-  }, [orderDispatch, currentMealDispatch]);
+  }, [currentMeal, orderDispatch, currentMealDispatch]);
 
   const handleMealChangeClick = useCallback<
     MouseEventHandler<HTMLButtonElement>
@@ -65,7 +65,8 @@ const TicketBuilderForm: React.FC<{
   >(() => {
     backendDispatch({});
     orderDispatch({ type: 'CLEAR' });
-  }, [backendDispatch, orderDispatch]);
+    currentMealDispatch({ type: 'CLEAR' });
+  }, [backendDispatch, orderDispatch, currentMealDispatch]);
 
   const presentationalProps = {
     table: order.table,

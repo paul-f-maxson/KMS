@@ -5,29 +5,36 @@ import { Order } from 'kms-types';
 import Ticket from '../Ticket';
 import TicketBuilder from './TicketBuilder';
 
-import reducer from './reducer';
+import orderReducer, { defaultState as defaultOrder } from './orderReducer';
 
-import makeId from '../../utils/makeId';
+import mealReducer, { defaultState as defaultMeal } from './currentMealReducer';
 
 export type LocalState = Order;
 
-const defaultOrder = {
-  id: makeId(),
-  delay: 0,
-  table: 0,
-  meals: [],
-};
-
 const PointOfSale = () => {
-  const [order, orderDispatch] = useReducer(reducer, defaultOrder);
+  const [order, orderDispatch] = useReducer(orderReducer, defaultOrder);
+
+  const [currentMeal, currentMealDispatch] = useReducer(
+    mealReducer,
+    defaultMeal
+  );
+
+  const ticketBuilderProps = {
+    order,
+    orderDispatch,
+    currentMeal,
+    currentMealDispatch,
+  };
+
+  const orderTemp = { ...order, meals: [...order.meals, currentMeal] };
 
   return (
     <Grid container spacing={2}>
       <Grid item>
-        <Ticket {...order} />
+        <Ticket {...orderTemp} />
       </Grid>
       <Grid item>
-        <TicketBuilder orderDispatch={orderDispatch} order={order} />
+        <TicketBuilder {...ticketBuilderProps} />
       </Grid>
     </Grid>
   );
