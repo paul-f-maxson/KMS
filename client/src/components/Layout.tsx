@@ -12,7 +12,7 @@ import Expeditor from './Expeditor';
 import Dashboard from './Dashboard';
 import PointOfSale from './PointOfSale';
 
-import useTabs from '../hooks/useTabs';
+import useActiveMember from '../hooks/useActiveMember';
 
 const BottomAppBar = styled(AppBar)({
   top: 'auto',
@@ -31,7 +31,7 @@ const [PanelSelectionTabs, TabPanels] = makeTabComponents(uiPanelsConfig);
  */
 const Layout: React.FC = () => {
   // NOTE: Change default tab back to 0 when done working on this
-  const [activeTabIndex, handleTabChange] = useTabs(2);
+  const [activeTabIndex, handleTabChange] = useActiveMember(2);
 
   return (
     <Container>

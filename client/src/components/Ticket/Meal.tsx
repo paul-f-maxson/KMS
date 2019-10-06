@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactText } from 'react';
 import Box from '@material-ui/core/Box';
 
 import { styled } from '@material-ui/styles';
@@ -27,7 +27,7 @@ const SeatNumberLabel = styled('div')({
 });
 
 /** A component rendering a single meal and its associated seat number */
-const Meal: React.FC<{ dish: string; seat: number }> = ({ dish, seat }) => (
+const Meal: React.FC<{ dish: string; seat: ReactText }> = ({ dish, seat }) => (
   <>
     <Box display="flex" width="100%" justifyContent="space-between">
       {/* Dish */}

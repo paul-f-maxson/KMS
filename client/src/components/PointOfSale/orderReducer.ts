@@ -1,33 +1,57 @@
-import { LocalState } from '.';
-import { Action } from 'kms-types';
+import { Meal } from 'kms-types';
 
-import makeReducer from '../../utils/makeReducer';
+import { LocalActionType } from './orderActions';
 
-import makeId from '../../utils/makeId';
-
-export type LocalAction = Action<'ADD_MEAL' | 'CHANGE_TABLE' | 'CLEAR'>;
+const sequentialIds = (function*() {
+  let n = 0;
+  while (true) {
+    yield (n++).toString();
+  }
+})();
 
 const makeDefaultState = () => ({
-  id: makeId(),
+  id: sequentialIds.next().value,
   delay: 0,
-  table: 0,
-  meals: [],
+  table: '0',
+  meals: new Array<Meal>(),
 });
+
+type LocalState = ReturnType<typeof makeDefaultState>;
 
 export const defaultState = makeDefaultState();
 
-const on: {
-  [actionType: string]: React.Reducer<LocalState, LocalAction>;
-} = {
-  ADD_MEAL: (prevState, { newMeal }) => ({
-    ...prevState,
-    meals: [...prevState.meals, newMeal],
-  }),
-  CHANGE_TABLE: (prevState, { table }) => ({
-    ...prevState,
-    table,
-  }),
-  CLEAR: () => makeDefaultState(),
+const reducer: React.Reducer<LocalState, LocalActionType> = (
+  prevState,
+  action
+) => {
+  switch (action.type) {
+    case 'ADD_MEAL':
+      if (action.newMeal) {
+        return {
+          ...prevState,
+          meals: [
+            ...prevState.meals,
+            { ...action.newMeal, id: sequentialIds.next().value },
+          ],
+        };
+        // this throw should be impossible as long as TS does its job, but incuding just in case
+      } else throw new TypeError();
+
+    case 'CHANGE_TABLE':
+      if (action.table || action.table === '') {
+        return {
+          ...prevState,
+          table: action.table,
+        };
+        // this throw should be impossible as long as TS does its job, but incuding just in case
+      } else throw new TypeError();
+
+    case 'CLEAR':
+      return makeDefaultState();
+
+    default:
+      return prevState;
+  }
 };
 
-export default makeReducer(on);
+export default reducer;

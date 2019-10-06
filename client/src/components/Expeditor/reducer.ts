@@ -1,14 +1,21 @@
 import { LocalState } from '.';
 import { Action } from 'kms-types';
 
-import makeReducer from '../../utils/makeReducer';
+export type LocalAction = Action<'ADD' | 'BUMP'>;
 
-export type LocalAction = Action<'ADD'>;
+const reducer: React.Reducer<LocalState, LocalAction> = (
+  prevOrders,
+  action
+) => {
+  switch (action.type) {
+    case 'ADD':
+      if (action.order) {
+        return [...prevOrders, action.order];
+      } else throw new TypeError();
 
-const on: {
-  [actionType: string]: React.Reducer<LocalState, LocalAction>;
-} = {
-  ADD: (orders, action) => [...orders, action.order],
+    default:
+      return prevOrders;
+  }
 };
 
-export default makeReducer(on);
+export default reducer;

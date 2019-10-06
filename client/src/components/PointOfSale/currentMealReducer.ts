@@ -1,26 +1,37 @@
-import { LocalState } from './TicketBuilder';
-import { Action } from 'kms-types';
-
-import makeReducer from '../../utils/makeReducer';
-
-import makeId from '../../utils/makeId';
-
-export type LocalAction = Action<'CHANGE_MEAL' | 'CHANGE_SEAT' | 'CLEAR'>;
+import { LocalActionType } from './currentMealActions';
 
 const makeDefaultState = () => ({
-  id: makeId(),
-  seat: 0,
+  id: '',
+  seat: '',
   dish: '',
 });
 
+export type LocalState = ReturnType<typeof makeDefaultState>;
+
 export const defaultState = makeDefaultState();
 
-const on: {
-  [actionType: string]: React.Reducer<LocalState, LocalAction>;
-} = {
-  CHANGE_MEAL: (prevState, action) => ({ ...prevState, dish: action.dish }),
-  CHANGE_SEAT: (prevState, action) => ({ ...prevState, seat: action.seat }),
-  CLEAR: () => makeDefaultState(),
+const reducer: React.Reducer<LocalState, LocalActionType> = (
+  prevState,
+  action
+) => {
+  switch (action.type) {
+    case 'CHANGE_MEAL':
+      if (action.dish || action.dish === '') {
+        return { ...prevState, dish: action.dish };
+      } else throw new TypeError();
+
+    case 'CHANGE_SEAT': {
+      if (action.seat || action.seat === '') {
+        return { ...prevState, seat: action.seat };
+      } else throw new TypeError();
+    }
+
+    case 'CLEAR':
+      return makeDefaultState();
+
+    default:
+      return prevState;
+  }
 };
 
-export default makeReducer(on);
+export default reducer;

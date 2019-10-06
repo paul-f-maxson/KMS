@@ -6,47 +6,41 @@ import React, {
 
 import { Order, Meal } from 'kms-types';
 
-import { LocalAction as OrderAction } from '../orderReducer';
+import * as OrderActions from '../orderActions';
 
-import { LocalAction as MealAction } from '../currentMealReducer';
+import * as CurrentMealActions from '../currentMealActions';
 
 import Presentational from './Presentational';
 import useBackendDispatch from '../../../hooks/useBackendDispatch';
 
-export type LocalState = Meal;
-
 const TicketBuilderForm: React.FC<{
   order: Order;
-  orderDispatch: React.Dispatch<OrderAction>;
+  orderDispatch: React.Dispatch<OrderActions.LocalActionType>;
   currentMeal: Meal;
-  currentMealDispatch: React.Dispatch<MealAction>;
+  currentMealDispatch: React.Dispatch<CurrentMealActions.LocalActionType>;
 }> = ({ order, orderDispatch, currentMeal, currentMealDispatch }) => {
   const backendDispatch = useBackendDispatch();
 
   const handleTableChange = useCallback<ChangeEventHandler<HTMLInputElement>>(
     ({ target: { value } }) => {
-      orderDispatch({ type: 'CHANGE_TABLE', table: value });
+      orderDispatch(OrderActions.changeTable(value));
     },
     [orderDispatch]
   );
 
-  // OPTIMIZE: Remove currentMeal dependency
   const handleNewMealClick = useCallback<
     MouseEventHandler<HTMLButtonElement>
   >(() => {
-    orderDispatch({ type: 'ADD_MEAL', newMeal: currentMeal });
+    orderDispatch(OrderActions.addMeal(currentMeal));
 
-    currentMealDispatch({ type: 'CLEAR' });
+    currentMealDispatch(CurrentMealActions.clear());
   }, [currentMeal, orderDispatch, currentMealDispatch]);
 
   const handleMealChangeClick = useCallback<
     MouseEventHandler<HTMLButtonElement>
   >(
-    event => {
-      currentMealDispatch({
-        type: 'CHANGE_MEAL',
-        dish: event.currentTarget.value,
-      });
+    ({ currentTarget: { value } }) => {
+      currentMealDispatch(CurrentMealActions.changeMeal(value));
     },
     [currentMealDispatch]
   );
@@ -55,7 +49,7 @@ const TicketBuilderForm: React.FC<{
     ChangeEventHandler<HTMLInputElement>
   >(
     ({ target: { value } }) => {
-      currentMealDispatch({ type: 'CHANGE_SEAT', seat: value });
+      currentMealDispatch(CurrentMealActions.changeSeat(value));
     },
     [currentMealDispatch]
   );
@@ -63,10 +57,10 @@ const TicketBuilderForm: React.FC<{
   const handleOrderSubmitClick = useCallback<
     MouseEventHandler<HTMLButtonElement>
   >(() => {
-    backendDispatch({});
-    orderDispatch({ type: 'CLEAR' });
-    currentMealDispatch({ type: 'CLEAR' });
-  }, [backendDispatch, orderDispatch, currentMealDispatch]);
+    backendDispatch({ type: 'ADD', order });
+    orderDispatch(OrderActions.clear());
+    currentMealDispatch(OrderActions.clear());
+  }, [order, backendDispatch, orderDispatch, currentMealDispatch]);
 
   const presentationalProps = {
     table: order.table,

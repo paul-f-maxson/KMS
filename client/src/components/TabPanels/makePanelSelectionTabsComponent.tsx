@@ -5,11 +5,11 @@ import Tab from '@material-ui/core/Tab';
 
 import { TabPanelsConfigType } from '.';
 
-import { TabChangeHandler } from '../../types';
+import { ActiveMemberChangeHandler } from '../../hooks/useActiveMember';
 
 export type PanelSelectionTabsComponent = React.FC<{
   activeTabIndex: number;
-  handleTabChange: TabChangeHandler;
+  handleTabChange: ActiveMemberChangeHandler;
 }>;
 
 const makePanelSelectionTabsComponent: // Type definition
@@ -18,7 +18,7 @@ const makePanelSelectionTabsComponent: // Type definition
   panelsConfig => ({ activeTabIndex, handleTabChange }) => (
     <Tabs value={activeTabIndex} onChange={handleTabChange}>
       {panelsConfig.map(([, , tabLabel], index) => (
-        <Tab label={tabLabel} id={`tab-${index}`} />
+        <Tab label={tabLabel} key={index} id={`tab-${index}`} />
       ))}
     </Tabs>
   );

@@ -14,7 +14,7 @@ const makePanelsComponent: // Type definition
   panelsConfig => ({ activeTabIndex }) => (
     <>
       {panelsConfig.map(([PanelComponent, panelTitle], index) => (
-        <TabPanel value={activeTabIndex} index={index}>
+        <TabPanel value={activeTabIndex} index={index} key={index}>
           <TabPanelTitle>{panelTitle}</TabPanelTitle>
           <PanelComponent />
         </TabPanel>

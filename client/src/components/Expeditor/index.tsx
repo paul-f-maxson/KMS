@@ -8,7 +8,7 @@ import Presentational from './Presentational';
 
 import reducer from './reducer';
 
-import mockOrders from '../../mockOrders';
+// import mockOrders from '../../mockOrders';
 
 export type LocalState = Array<Order>;
 
@@ -17,7 +17,7 @@ const defaultLocalState: LocalState = [];
 const Expeditor: React.FC = () => {
   const orders = useBackendSocket('/machine', reducer, defaultLocalState);
 
-  return <Presentational orders={mockOrders} />;
+  return <Presentational orders={orders} />;
 };
 
 export default Expeditor;
